@@ -2,7 +2,7 @@
 """
 Citation reference table generator.
 Scans [CITE:xxx] placeholders, assigns numbers by first-appearance order,
-and outputs a formatted reference table using rich.
+outputs a compact plain-text table (avoids Claude Code output collapse).
 
 Usage:
     python cite_table.py <input_file>
@@ -10,12 +10,7 @@ Usage:
 
 import re
 import sys
-import os
 from collections import OrderedDict
-
-from rich.console import Console
-from rich.table import Table
-from rich.text import Text
 
 PLACEHOLDER_RE = re.compile(r'\[CITE:([a-zA-Z0-9_\-]+)\]')
 DISCLAIMER = (
@@ -65,8 +60,6 @@ def format_author(key):
 
 
 def main():
-    console = Console()
-
     if len(sys.argv) > 1:
         with open(sys.argv[1], 'r', encoding='utf-8') as f:
             text = f.read()
@@ -76,16 +69,6 @@ def main():
     placeholders = scan_order(text)
     mapping = {k: placeholders[k] for k in placeholders}
 
-    num_hdr = '#'
-    author_hdr = 'Author'
-    ctx_hdr = 'Context (50 chars)'
-    status_hdr = 'Status'
-    status_ok = 'OK'
-    status_reuse = 'Reuse'
-    status_bad = 'Bad Order'
-    title = 'Reference Table'
-
-    # Build flat list of all occurrences with context
     occurrences = []
     for match in PLACEHOLDER_RE.finditer(text):
         key = match.group(1)
@@ -94,30 +77,21 @@ def main():
         ctx = ctx.replace(f'[CITE:{key}]', f'[{num}]')
         occurrences.append({'num': num, 'key': key, 'context': ctx})
 
-    # Determine status for each occurrence
     key_first_seen = {}
     for occ in occurrences:
         key = occ['key']
         if key not in key_first_seen:
             key_first_seen[key] = True
-            occ['status'] = status_ok
+            occ['status'] = 'OK'
         else:
-            occ['status'] = status_reuse
+            occ['status'] = 'Reuse'
 
-    # Print disclaimer
-    console.print()
-    console.print(f'[dim]{DISCLAIMER}[/]')
-    console.print()
-
-    table = Table(
-        title=f'[bold]{title}[/]',
-        border_style='bright_black',
-        show_lines=True,
-    )
-    table.add_column(num_hdr, style='cyan', width=6)
-    table.add_column(author_hdr, style='yellow', width=16)
-    table.add_column(ctx_hdr, style='white', width=52)
-    table.add_column(status_hdr, style='green', width=12)
+    # Compact plain-text table
+    print()
+    print(DISCLAIMER)
+    print()
+    print(f'{"#":<4} {"Author":<14} {"Context (50 chars)":<52} {"Status":<10}')
+    print('-' * 82)
 
     seen = set()
     for occ in occurrences:
@@ -125,16 +99,10 @@ def main():
         if key in seen:
             continue
         seen.add(key)
-        num_str = str(occ['num'])
-        table.add_row(
-            Text(num_str, style='cyan'),
-            Text(format_author(key), style='yellow'),
-            Text(occ['context']),
-            Text(occ['status'], style='green'),
-        )
+        print(f'{occ["num"]:<4} {format_author(key):<14} {occ["context"]:<52} {occ["status"]:<10}')
 
-    console.print(table)
-    console.print(f'[dim]{len(seen)} references total.[/]')
+    print('-' * 82)
+    print(f'{len(seen)} references total.')
 
 
 if __name__ == '__main__':
