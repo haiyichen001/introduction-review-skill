@@ -169,25 +169,38 @@ Reference list: [1]..., [2]..., [3]...
 Neural mesh segmentation [3]... Point cloud methods [1]...  ← numbers out of order
 ```
 
-#### CRITICAL: One Citation Per Claim Rule
+#### CRITICAL: Citation Group Size Limit
 
-**Do not pile multiple unrelated citations at the end of a sentence.**
+**Grouped citations `[1,3,5]` or `[1-5]` are allowed, but with strict limits.**
 
-Each sentence should cite the specific paper(s) that support THAT claim. Different claims get different citations. A paragraph ending with `[1-5]` that covers five unrelated points is incorrect.
+- **Default max**: 3 papers per citation bracket (e.g., `[1,2,4]` or `[1-3]`)
+- **Absolute max**: 5 papers per bracket — never exceed this
+- **If the draft needs more than 3 citations at one point**: MUST use `AskUserQuestion` to confirm with the user. Let them choose which papers to keep or approve the larger group.
 
-**Correct (one claim → one citation group):**
+AskUserQuestion format:
+```
+Question: "This claim currently cites 6 papers [3-8]. Keep all 6, or select up to 5?"
+Options:
+  - "Keep the first 3: [3-5]"
+  - "Keep the last 3: [6-8]"
+  - "Keep all 6 (override, max 5 allowed but user approved)"
+  - "Let me choose manually"
+```
+
+**Correct (each claim → specific supporting papers):**
 ```
 Smith [1] proposed a graph-based segmentation method. However, their approach
 assumes watertight meshes, which limits applicability to real-world scans [2,3].
 ```
 
-**Wrong (unrelated claims bundled into one citation):**
+**Avoid (unrelated claims bundled into one bracket):**
 ```
 Segmentation is important. GNNs are good for meshes. Transformers handle
 point clouds well. Recent methods combine both [1-4].
 ```
+— This is wrong not because of the number, but because each sentence should cite the paper(s) supporting THAT specific statement.
 
-**Exception**: When multiple papers independently reach the same conclusion, they can share a citation marker: `Several studies [4-7] have confirmed this finding.`
+**When to group citations**: Multiple papers that independently support the SAME claim can share a bracket. Example: `Several studies [4-7] have confirmed this finding.` If this exceeds 3, ask the user.
 
 #### CRITICAL: Diplomatic Critique — Do Not Attack Prior Work
 
@@ -264,7 +277,7 @@ Reference entries:       8
 Sequential order check:  PASS ([1]→[8], no gaps, no duplicates)
 Orphan references:       0  (in bibliography but not cited)
 Missing references:      0  (cited but not in bibliography)
-One-citation-per-claim:  PASS (each citation supports its specific sentence)
+Citation group size:     PASS (max 3 per bracket, all within limit)
 Tone check:              PASS (all critiques diplomatically phrased)
 Unsupported claims:      1  — line 45 claims "SOTA performance" without citation
 
@@ -417,7 +430,7 @@ Always pair criticism with acknowledgment. The structure is: "X achieved [positi
 ## Key Principles
 
 - **Sequential numbering is law**: citations `[1]`, `[2]`, `[3]`... appear in strict order of first mention in the text. References at the end also numbered `[1]`, `[2]`, `[3]`... in that same order. No exceptions.
-- **One claim, one citation**: each sentence cites the specific paper(s) supporting THAT claim. No bulk citations at paragraph end.
+- **Citation group limit**: max 3 papers per bracket by default, absolute max 5. Exceeding 3 triggers `AskUserQuestion` confirmation.
 - **Critique through comparison, not attack**: point out scope limitations and trade-offs, not failures. Use "while/however/although" structures.
 - **Traceability first**: every citation must resolve to a real paper with verified metadata.
 - **No hallucinated papers**: never invent titles, authors, or DOIs — use search tools to verify.
