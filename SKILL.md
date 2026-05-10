@@ -21,17 +21,21 @@ Use this skill when the user:
 
 ### Phase 0: Check & Install MCP Tools
 
-**This runs FIRST, before anything else. No tool means no paper search, no citation — everything downstream depends on this.**
+**This runs FIRST, before anything else. Show each check individually with a checkmark so the user sees liveness — don't batch them all at once.**
 
-Print the skill banner and start checking immediately:
+Print the skill banner and check each tool one by one:
 
 ```
 === Introduction Review Skill ===
---- MCP Tool Check ---
 Checking required tools...
+  arxiv ............... found ✓
+  scholar ............. found ✓
+  paper-search ........ found ✓
+  pdf-reader .......... found ✓
+All required MCPs ready.
 ```
 
-Required MCP servers:
+Required MCP servers (4 total):
 
 | MCP Server | Purpose | Required |
 |------------|---------|----------|
@@ -39,11 +43,16 @@ Required MCP servers:
 | `scholar` | Search Semantic Scholar, citations | Yes |
 | `paper-search` | Search arXiv/bioRxiv/medRxiv/PubMed/Google Scholar | Yes |
 | `pdf-reader` | Read local PDF files | Yes |
-| `playwright` | Fallback web search if APIs fail | Optional |
 
-**Check step**: Call `ListMcpResourcesTool` to see what's currently connected. Map which servers are available.
+**Check step**: Call `ListMcpResourcesTool` to see what's currently connected, then map each required server against available tools. Print each line as it completes — do NOT wait for all checks before showing output.
 
-**Install missing MCPs**:
+**If any MCP is missing**, output:
+
+```
+  arxiv ............... missing ✗ — installing...
+```
+
+Then install it:
 
 1. Detect where the user installs MCPs:
    - Check `C:\Users\<user>\.claude\claude_desktop_config.json` (Claude Desktop)
@@ -51,21 +60,17 @@ Required MCP servers:
    - Check `C:\Users\<user>\AppData\Roaming\Claude\mcp.json` (Claude Code user)
    - Print the detected location
 
-2. Install each missing MCP server. Show each step:
+2. Install and show progress:
 
 ```
-[1/3] arxiv MCP — installing via Smithery...
-      npx @anthropic-ai/mcp-installer add arxiv
-[2/3] scholar MCP — already installed, skipping
-[3/3] pdf-reader MCP — installing via Smithery...
-      npx @anthropic-ai/mcp-installer add pdf-reader
-
-All required MCPs ready.
+  arxiv ............... installing via Smithery...
+                        npx @anthropic-ai/mcp-installer add arxiv
+                        done ✓
 ```
 
 3. If automatic install fails, print the exact command the user should run manually.
 
-4. After install, verify by calling `ListMcpResourcesTool` again.
+4. After install, verify all tools again and print the final status block.
 
 ### Phase 1: Detect Intent
 
