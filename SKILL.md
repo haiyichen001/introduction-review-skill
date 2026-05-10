@@ -365,63 +365,28 @@ Options:
   - "Not yet, let me review placeholders first"
 ```
 
-If user chooses "Yes", run the numbering pass with FULL streaming output. Show every step:
+If user chooses "Yes", run the numbering pass using `scripts/cite_scan.py`. This is deterministic — no LLM guessing. Run the script and stream its output directly to the user:
 
 ```
---- Numbering Pass ---
-Step 1: Scan text for all unique placeholders in order of first appearance...
-  1st: [CITE:wang2024]
-  2nd: [CITE:smith2023]
-  3rd: [CITE:jones2022]
-  4th: [CITE:lee2021]
-  5th: [CITE:brown2020]
-Found 5 unique placeholders.
-
-Step 2: Build mapping table (placeholder → assigned number)...
-  [CITE:wang2024]  → [1]
-  [CITE:smith2023] → [2]
-  [CITE:jones2022] → [3]
-  [CITE:lee2021]   → [4]
-  [CITE:brown2020] → [5]
-
-Step 3: Replace all placeholders in text with assigned numbers...
-  Line 12: [CITE:wang2024]  → [1] ✓
-  Line 15: [CITE:smith2023] → [2] ✓
-  Line 18: [CITE:jones2022] → [3] ✓
-  Line 19: [CITE:lee2021]   → [4] ✓
-  Line 19: [CITE:jones2022] → [3] ✓ (reuse)
-  Line 23: [CITE:brown2020] → [5] ✓
-  Line 25: [CITE:smith2023] → [2] ✓ (reuse)
-All 7 occurrences replaced. 5 unique papers cited.
-
-Step 4: Generate reference list in [1]→[5] order...
-  [1] Wang et al., ...
-  [2] Smith et al., ...
-  [3] Jones & Lee, ...
-  [4] Lee et al., ...
-  [5] Brown et al., ...
-Reference list generated.
-
-Numbering pass complete. Showing draft:
-
---- Reviewing Draft ---
-[numbered draft text here]
---- References ---
-[formatted reference list here]
+--- Running Numbering Pass (cite_scan.py) ---
 ```
+→ Execute: `python scripts/cite_scan.py <draft_file>`
+→ OR: `echo "<draft_text>" | python scripts/cite_scan.py` if draft is in-memory
+
+The script outputs step-by-step:
+  1. Scans for all [CITE:xxx] placeholders, prints each in order of first appearance
+  2. Builds and prints the mapping table (placeholder → number)
+  3. Replaces each occurrence one by one, marking reuse
+  4. Outputs the complete numbered text
+
+Stream the script's stdout to the user in real-time. The script prints everything — scan order, mapping, replacements, numbered text. After the script completes, run it again with `--json` to get structured data for Phase 5 reference generation.
 
 If user chooses "Not yet", show the draft with placeholders visible for their review.
 
-**After any subsequent edit that touches citations**, the skill MUST proactively ask again: "Citation order changed. Renumber now?" Same two-option prompt as above.
+**After any edit that touches citations**, ask again: "Citation order changed. Renumber now?" If yes, re-run `cite_scan.py` — it renumbers from scratch.
 
-**If user requests edits** (add/remove/reorder citations):
-1. Revert the affected section back to placeholder form
-2. Apply the edit with `[CITE:key]` placeholders
-3. Re-run the numbering pass — ALL numbers may shift, this is expected
-4. Regenerate the reference list
-5. Show the updated draft
-
-**If no citation changes**, iterate on wording directly.
+**Edit workflow**:
+1. Revert affected section to placeholder form → 2. Edit with `[CITE:key]` → 3. `python scripts/cite_scan.py <file>` → 4. Regenerate reference list from JSON → 5. Show updated draft
 
 Ask the user for feedback. Iterate on specific sections rather than rewriting the whole thing.
 
@@ -625,10 +590,14 @@ Always pair criticism with acknowledgment. The structure is: "X achieved [positi
 - **Show progress always**: print a header before each phase.
 - **Auto-search over asking**: if the user didn't provide papers, search automatically.
 
-## MCP Tools Referenced
+## External Resources
 
+**MCP Servers**:
 - `mcp__arxiv__*` — search, abstract, full-text retrieval
 - `mcp__scholar__*` — search papers, get citations/references, download PDFs
 - `mcp__paper-search__*` — search across arXiv, bioRxiv, medRxiv, PubMed, Google Scholar
 - `mcp__pdf-reader__read_pdf` — extract text from local PDFs
 - `ListMcpResourcesTool` — check available MCP servers
+
+**Scripts** (deterministic, no LLM guessing):
+- `scripts/cite_scan.py` — placeholder scanner + numbering pass engine. Always use this for numbering, never do it manually.
