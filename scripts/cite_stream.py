@@ -67,9 +67,13 @@ def main():
     # === STEP 2: Mapping ===
     flush('--- Number Assignment ---')
     mapping = {}
+    batch = []
     for key in ordered_keys:
         mapping[key] = placeholders[key]
-        flush(f'  [{mapping[key]}] = [CITE:{key}]')
+        batch.append(f'[{mapping[key]}] = [CITE:{key}]')
+        if len(batch) >= 3 or key == ordered_keys[-1]:
+            flush('  ' + '  |  '.join(batch))
+            batch = []
     flush('')
 
     # === STEP 3: Numbered Text ===
