@@ -19,6 +19,22 @@ Use this skill when the user:
 
 ## Workflow
 
+### CRITICAL: Streaming Output Rule — Every Phase
+
+**Every phase below MUST produce live, step-by-step output. NEVER print a static summary all at once. The user must SEE each sub-step happening.**
+
+Example pattern for every operation:
+```
+--- Phase X: Name ---
+[1/N] doing thing A...
+[2/N] thing A done ✓
+[3/N] doing thing B...
+[4/N] thing B done ✓
+Complete.
+```
+
+This applies to: fetching papers, reading papers, drafting sections, running numbering passes, generating references, auditing citations. Every operation that involves multiple items MUST show each item being processed.
+
 ### Phase 0: Check & Install MCP Tools
 
 **This runs FIRST. You MUST execute each check with an actual tool call — NOT just print a summary. The user must see each line appear one at a time as the check happens.**
@@ -94,40 +110,44 @@ Analyzing your input...
 
 ### Phase 2: Gather Papers
 
-**If user provided papers** → fetch metadata for each:
+**If user provided papers** → fetch metadata one by one, printing after each:
 ```
 --- Fetching Paper Metadata ---
-[1/3] arXiv:2103.12345 → "Neural Mesh Segmentation with GNNs" (2021)
-[2/3] arXiv:2205.67890 → "Point Cloud Understanding via Transformers" (2022)
-[3/3] 10.1145/3456789 → "Geometry Processing Survey" (2020)
+[1/3] arXiv:2103.12345 → fetching... "Neural Mesh Segmentation with GNNs" (2021) ✓
+[2/3] arXiv:2205.67890 → fetching... "Point Cloud Understanding via Transformers" (2022) ✓
+[3/3] 10.1145/3456789 → fetching... "Geometry Processing Survey" (2020) ✓
 Done.
 ```
 
-**If user has NO papers** → search automatically:
+**If user has NO papers** → search automatically, print each source as it completes:
 ```
 --- Searching for Papers ---
 Topic: "neural mesh segmentation"
-Searching arXiv... found 15 papers
-Searching Semantic Scholar... found 23 papers
-Ranking by relevance and citations...
-
-Top candidates (show 5-8 papers with title, year, citations):
-1. "Neural Mesh Segmentation..." (2023, 142 cites)
-2. "Geometry Processing..." (2022, 89 cites)
-...
-
-Ask user: "I found these papers. Which ones should I use? You can reply with numbers (e.g., '1,3,5') or provide your own."
+Searching arXiv... found 15 papers ✓
+Searching Semantic Scholar... found 23 papers ✓
+Merging, removing duplicates, ranking by citation count...
+Top 6 candidates:
+  1. "Neural Mesh Segmentation with Deep Learning" (2023, 142 cites)
+  2. "3D Geometry Processing: A Survey" (2022, 89 cites)
+  3. "Point Cloud Understanding via Transformers" (2023, 76 cites)
+  4. "Graph Neural Networks for Mesh Analysis" (2021, 210 cites)
+  5. "Hybrid Geometric Deep Learning" (2024, 34 cites)
+  6. "Real-time Mesh Segmentation on Mobile Devices" (2023, 28 cites)
 ```
 
-**Read papers** (for each confirmed paper):
+Then use `AskUserQuestion`: "Which papers should I use? Select by number (e.g., 1,3,5)."
+
+**Read papers** — process one at a time, extracting structured notes:
 ```
 --- Reading Papers ---
-[1/5] Downloading and extracting key points from "Neural Mesh Segmentation..."
-      - Problem: ...
-      - Method: ...
-      - Key result: ...
-      - Relationship to your work: ...
-[2/5] ...
+[1/4] "Neural Mesh Segmentation..." → downloading full text... extracting key points ✓
+      Problem: semantic segmentation of 3D meshes in wild
+      Method: GNN + attention on mesh edges
+      Key result: 94.3% accuracy on ShapeNet, fails on non-manifold meshes
+      Relationship: baseline for mesh-based approach, your method handles non-manifold cases
+
+[2/4] "Point Cloud Understanding..." → downloading full text... extracting key points ✓
+      ...
 ```
 
 ### Phase 3: Draft Introduction / Literature Review
@@ -136,15 +156,15 @@ Follow standard academic intro structure. Show the structure before writing:
 
 ```
 --- Drafting Introduction ---
-Structure:
-  1. Hook (broad context)
-  2. Problem statement (the gap)
-  3. Related work (what others did, limitations)
-  4. Our approach (how this work fills the gap)
-  5. Contributions
-  6. Paper roadmap
+Structure: Hook → Problem Statement → Related Work → Our Approach → Contributions → Roadmap
 
-Drafting...
+[1/6] Writing hook (broad context)... ✓
+[2/6] Writing problem statement (the gap)... ✓
+[3/6] Writing related work with [CITE:xxx] placeholders... ✓
+[4/6] Writing our approach... ✓
+[5/6] Writing contributions... ✓
+[6/6] Writing roadmap... ✓
+Draft complete. 8 unique placeholders used.
 ```
 
 Ask the user for THE key differentiator of their work if not yet stated:
@@ -314,27 +334,49 @@ Options:
   - "Not yet, let me review placeholders first"
 ```
 
-If user chooses "Yes":
-- Run the numbering pass
-- Replace all placeholders with real numbers
-- Generate the reference list
-- Show the complete numbered draft
+If user chooses "Yes", run the numbering pass with FULL streaming output. Show every step:
 
 ```
 --- Numbering Pass ---
-Scanning placeholder order...
-  [CITE:smith2023] → first appears in paragraph 2 → assigned [1]
-  [CITE:jones2022] → first appears in paragraph 3 → assigned [2]
-  [CITE:lee2021]   → first appears in paragraph 3 → assigned [3]
-All placeholders replaced. Reference list generated.
+Step 1: Scan text for all unique placeholders in order of first appearance...
+  1st: [CITE:wang2024]
+  2nd: [CITE:smith2023]
+  3rd: [CITE:jones2022]
+  4th: [CITE:lee2021]
+  5th: [CITE:brown2020]
+Found 5 unique placeholders.
+
+Step 2: Build mapping table (placeholder → assigned number)...
+  [CITE:wang2024]  → [1]
+  [CITE:smith2023] → [2]
+  [CITE:jones2022] → [3]
+  [CITE:lee2021]   → [4]
+  [CITE:brown2020] → [5]
+
+Step 3: Replace all placeholders in text with assigned numbers...
+  Line 12: [CITE:wang2024]  → [1] ✓
+  Line 15: [CITE:smith2023] → [2] ✓
+  Line 18: [CITE:jones2022] → [3] ✓
+  Line 19: [CITE:lee2021]   → [4] ✓
+  Line 19: [CITE:jones2022] → [3] ✓ (reuse)
+  Line 23: [CITE:brown2020] → [5] ✓
+  Line 25: [CITE:smith2023] → [2] ✓ (reuse)
+All 7 occurrences replaced. 5 unique papers cited.
+
+Step 4: Generate reference list in [1]→[5] order...
+  [1] Wang et al., ...
+  [2] Smith et al., ...
+  [3] Jones & Lee, ...
+  [4] Lee et al., ...
+  [5] Brown et al., ...
+Reference list generated.
+
+Numbering pass complete. Showing draft:
 
 --- Reviewing Draft ---
-- Citation numbering: OK (sequential [1]-[3])
-- Citation coverage: 3/3 citations linked to papers
-- Citation group size: all within limit
-- Structure check: OK
-- Tone check: all critiques use diplomatic language
-- Flow check: transition between related work and our approach could be stronger
+[numbered draft text here]
+--- References ---
+[formatted reference list here]
 ```
 
 If user chooses "Not yet", show the draft with placeholders visible for their review.
@@ -362,13 +404,19 @@ Determine the correct format based on the user's target venue. See the [Citation
 --- Generating References ---
 Venue detected: IEEE Conference
 Format: IEEE (sequential numbering, square brackets)
-Mapping table → numbering pass → reference list:
 
-  [CITE:smith2023] → [1] J. Smith et al., "Mesh Segmentation with GNNs," ...
-  [CITE:jones2022] → [2] A. Jones and B. Lee, "Point Cloud Understanding," ...
-  [CITE:lee2021]   → [3] C. Lee et al., "Hybrid Segmentation," ...
+Generating each reference entry one by one...
+  [1/5] Smith et al. → formatted as IEEE journal article ✓
+  [2/5] Jones & Lee  → formatted as IEEE conference paper ✓
+  [3/5] Lee et al.   → formatted as IEEE journal article ✓
+  [4/5] Wang et al.  → formatted as IEEE conference paper ✓
+  [5/5] Brown et al. → formatted as IEEE journal article ✓
+All 5 references formatted.
 
-All 3 citations mapped. Reference list in sequential order.
+References (IEEE):
+[1] J. Smith et al., "Mesh Segmentation with GNNs," IEEE Trans. Vis. Comput. Graph., vol. 27, pp. 1234-1245, 2023.
+[2] A. Jones and B. Lee, "Point Cloud Understanding via Transformers," in Proc. CVPR, 2022, pp. 567-570.
+...
 ```
 
 **If the user edits citations in Phase 4**, the reference list is regenerated automatically after the re-numbering pass.
@@ -379,17 +427,17 @@ If the user didn't specify a format, ask: "Which target venue? Options: IEEE / S
 
 ```
 --- Citation Audit ---
-Placeholder check:       8 placeholders → 8 resolved → 0 orphan placeholders
-In-text citations:       8
-Reference entries:       8
-Sequential order check:  PASS ([1]→[8], no gaps, no skipped numbers)
-Orphan references:       0  (in reference list but not cited in text)
-Missing references:      0  (cited in text but not in reference list)
-Citation group size:     PASS (max 3 per bracket, all within limit)
-Tone check:              PASS (all critiques diplomatically phrased)
-Unsupported claims:      1  — line 45 claims "SOTA performance" without citation
+Running 7 checks one by one...
+  [1/7] Placeholder resolution... 5/5 resolved, 0 orphan ✓
+  [2/7] In-text citation count... 5 ✓
+  [3/7] Reference entry count... 5 ✓
+  [4/7] Sequential order check... [1]→[2]→[3]→[4]→[5], no gaps ✓
+  [5/7] Orphan reference check... 0 orphan (all refs cited in text) ✓
+  [6/7] Citation group size... max 3 per bracket, all within limit ✓
+  [7/7] Tone check... no forbidden phrases detected ✓
+  Extra: Unsupported claims... line 45 "SOTA" has no citation ⚠
 
-All clear, except: add citation for the SOTA claim on line 45.
+All checks passed. 1 warning: add citation for the SOTA claim on line 45.
 ```
 
 ---
