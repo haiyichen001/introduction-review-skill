@@ -95,20 +95,24 @@ All required MCPs ready.
 
 The user may arrive with any need. Detect it and jump directly to the right phase. The full sequence only applies when the user starts from scratch with just a topic.
 
+**CRITICAL: Token efficiency rule — NEVER search for papers if the user already has them.**
+- User gave paper IDs, a draft, or reference list → DO NOT call any search API. Waste of tokens.
+- User gave only a vague topic and nothing else → search is necessary. Proceed to Phase 2.
+
 Valid entry points and direct jumps:
 
-| User says | Jump to | Skip phases 0,1,2,3,4 |
-|-----------|---------|------------------------|
-| "帮我搜XXX相关的论文" | Phase 2 (search papers) | Skip 1 |
-| "帮我写这个topic的introduction" (no papers) | Phase 0→1→2→3 | None skipped |
-| "我有几篇论文，帮我写intro" + gives IDs | Phase 1→2→3 | Skip paper search portion of 2 |
-| "帮我改这段intro" + pastes draft | Phase 3 (edit mode) → 4 | Skip 0,1,2 |
-| "帮我格式化参考文献" + gives papers | Phase 5 | Skip 0,1,2,3,4 |
-| "检查引用有没有问题" + gives draft+refs | Phase 6 | Skip 0,1,2,3,4,5 |
-| "把这段intro里的引用从APA改成IEEE" | Phase 5 (reformat) | Skip 0,1,2,3,4 |
-| "我删了一篇引用，帮我重新编号" | Phase 4 (renumber only) | Skip 0,1,2,3,5 |
+| User says | Jump to | Search? |
+|-----------|---------|---------|
+| "帮我搜XXX相关的论文" | Phase 2 (search papers) | Yes — user explicitly asked to search |
+| "帮我写topic的introduction" + no papers | Phase 0→1→2→3 | Yes — no papers provided |
+| "我有几篇论文，帮我写intro" + gives IDs | Phase 1→2(fetch metadata only)→3 | No — just fetch the given IDs |
+| "帮我改这段intro" + pastes draft | Phase 3 (edit mode) → 4 | No — draft is right there |
+| "帮我格式化参考文献" + gives list | Phase 5 | No — data provided |
+| "检查引用有没有问题" + gives draft+refs | Phase 6 | No — data provided |
+| "把这段intro里的引用从APA改IEEE" | Phase 5 (reformat) | No — just reformat |
+| "我删了一篇引用，帮我重新编号" | Phase 4 (renumber) | No — just renumber |
 
-**Rule**: Ask yourself "what does the user actually need RIGHT NOW?" and go there. Don't force them through irrelevant phases.
+**Rule**: Ask "does the user already have the content?" If yes, work with what's given. Only search when there's nothing to work from.
 
 ### Phase 1: Detect Intent
 
