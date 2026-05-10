@@ -27,9 +27,9 @@ Example pattern for every operation:
 ```
 --- Phase X: Name ---
 [1/N] doing thing A...
-[2/N] thing A done ✓
+[2/N] thing A done ✅
 [3/N] doing thing B...
-[4/N] thing B done ✓
+[4/N] thing B done ✅
 Complete.
 ```
 
@@ -52,17 +52,17 @@ Step 4: If any is missing, install it (detect config path, run installer), showi
 ```
 === Introduction Review Skill ===
 Checking required tools...
-  arxiv ........................................ found ✓
-  scholar ...................................... found ✓
-  paper-search ................................. found ✓
-  pdf-reader ................................... found ✓
+  arxiv ........................................ found ✅
+  scholar ...................................... found ✅
+  paper-search ................................. found ✅
+  pdf-reader ................................... found ✅
 All required MCPs ready.
 ```
 
 **If a tool is missing**, replace the `found ✓` line with:
 
 ```
-  arxiv ........................................ missing ✗ — installing via Smithery...
+  arxiv ........................................ missing ❌ — installing via Smithery...
                                           npx @anthropic-ai/mcp-installer add arxiv
   arxiv ........................................ done ✓
 ```
@@ -133,9 +133,9 @@ Stream the detection steps:
 
 ```
 --- Detecting Intent ---
-  Scanning for drafts or file paths... [found: pasted text]
-  Scanning for paper IDs (DOI, arXiv)... [found: 3 IDs]
-  Scanning for venue keywords... [found: "IEEE"]
+  🔍 Scanning for drafts or file paths... [found: pasted text] ✅
+  🔍 Scanning for paper IDs (DOI, arXiv)... [found: 3 IDs] ✅
+  🔍 Scanning for venue keywords... [found: "IEEE"] ✅
   Routing decision: Phase 2 (fetch paper metadata) → Phase 3 (draft with IEEE style)
 ```
 
@@ -144,9 +144,9 @@ Stream the detection steps:
 **If user provided papers** → fetch metadata one by one, printing after each:
 ```
 --- Fetching Paper Metadata ---
-[1/3] arXiv:2103.12345 → fetching... "Neural Mesh Segmentation with GNNs" (2021) ✓
-[2/3] arXiv:2205.67890 → fetching... "Point Cloud Understanding via Transformers" (2022) ✓
-[3/3] 10.1145/3456789 → fetching... "Geometry Processing Survey" (2020) ✓
+[1/3] arXiv:2103.12345 → 📥 fetching... "Neural Mesh Segmentation with GNNs" (2021) ✅
+[2/3] arXiv:2205.67890 → 📥 fetching... "Point Cloud Understanding via Transformers" (2022) ✅
+[3/3] 10.1145/3456789 → 📥 fetching... "Geometry Processing Survey" (2020) ✅
 Done.
 ```
 
@@ -154,8 +154,8 @@ Done.
 ```
 --- Searching for Papers ---
 Topic: "neural mesh segmentation"
-Searching arXiv... found 15 papers ✓
-Searching Semantic Scholar... found 23 papers ✓
+🔍 Searching arXiv... found 15 papers ✅
+🔍 Searching Semantic Scholar... found 23 papers ✅
 Merging, removing duplicates, ranking by citation count...
 Top 6 candidates:
   1. "Neural Mesh Segmentation with Deep Learning" (2023, 142 cites)
@@ -171,13 +171,13 @@ Then use `AskUserQuestion`: "Which papers should I use? Select by number (e.g., 
 **Read papers** — process one at a time, extracting structured notes:
 ```
 --- Reading Papers ---
-[1/4] "Neural Mesh Segmentation..." → downloading full text... extracting key points ✓
+[1/4] "Neural Mesh Segmentation..." → 📖 downloading... extracting key points ✅
       Problem: semantic segmentation of 3D meshes in wild
       Method: GNN + attention on mesh edges
       Key result: 94.3% accuracy on ShapeNet, fails on non-manifold meshes
       Relationship: baseline for mesh-based approach, your method handles non-manifold cases
 
-[2/4] "Point Cloud Understanding..." → downloading full text... extracting key points ✓
+[2/4] "Point Cloud Understanding..." → 📖 downloading... extracting key points ✅
       ...
 ```
 
@@ -189,12 +189,12 @@ Follow standard academic intro structure. Show the structure before writing:
 --- Drafting Introduction ---
 Structure: Hook → Problem Statement → Related Work → Our Approach → Contributions → Roadmap
 
-[1/6] Writing hook (broad context)... ✓
-[2/6] Writing problem statement (the gap)... ✓
-[3/6] Writing related work with [CITE:xxx] placeholders... ✓
-[4/6] Writing our approach... ✓
-[5/6] Writing contributions... ✓
-[6/6] Writing roadmap... ✓
+[1/6] ✍️ Writing hook (broad context)... ✅
+[2/6] ✍️ Writing problem statement (the gap)... ✅
+[3/6] ✍️ Writing related work with [CITE:xxx] placeholders... ✅
+[4/6] ✍️ Writing our approach... ✅
+[5/6] ✍️ Writing contributions... ✅
+[6/6] ✍️ Writing roadmap... ✅
 Draft complete. 8 unique placeholders used.
 ```
 
@@ -373,11 +373,11 @@ Venue detected: IEEE Conference
 Format: IEEE (sequential numbering, square brackets)
 
 Generating each reference entry one by one...
-  [1/5] Smith et al. → formatted as IEEE journal article ✓
-  [2/5] Jones & Lee  → formatted as IEEE conference paper ✓
-  [3/5] Lee et al.   → formatted as IEEE journal article ✓
-  [4/5] Wang et al.  → formatted as IEEE conference paper ✓
-  [5/5] Brown et al. → formatted as IEEE journal article ✓
+  📚 [1/5] Smith et al. → formatted as IEEE journal article ✅
+  📚 [2/5] Jones & Lee  → formatted as IEEE conference paper ✅
+  📚 [3/5] Lee et al.   → formatted as IEEE journal article ✅
+  📚 [4/5] Wang et al.  → formatted as IEEE conference paper ✅
+  📚 [5/5] Brown et al. → formatted as IEEE journal article ✅
 All 5 references formatted.
 
 References (IEEE):
@@ -395,14 +395,14 @@ If the user didn't specify a format, ask: "Which target venue? Options: IEEE / S
 ```
 --- Citation Audit ---
 Running 7 checks one by one...
-  [1/7] Placeholder resolution... 5/5 resolved, 0 orphan ✓
-  [2/7] In-text citation count... 5 ✓
-  [3/7] Reference entry count... 5 ✓
-  [4/7] Sequential order check... [1]→[2]→[3]→[4]→[5], no gaps ✓
-  [5/7] Orphan reference check... 0 orphan (all refs cited in text) ✓
-  [6/7] Citation group size... max 3 per bracket, all within limit ✓
-  [7/7] Tone check... no forbidden phrases detected ✓
-  Extra: Unsupported claims... line 45 "SOTA" has no citation ⚠
+  [1/7] Placeholder resolution... 5/5 resolved, 0 orphan ✅
+  [2/7] In-text citation count... 5 ✅
+  [3/7] Reference entry count... 5 ✅
+  [4/7] Sequential order check... [1]→[2]→[3]→[4]→[5], no gaps ✅
+  [5/7] Orphan reference check... 0 orphan (all refs cited in text) ✅
+  [6/7] Citation group size... max 3 per bracket, all within limit ✅
+  [7/7] Tone check... no forbidden phrases detected ✅
+  Extra: Unsupported claims... line 45 "SOTA" has no citation ⚠️
 
 All checks passed. 1 warning: add citation for the SOTA claim on line 45.
 ```
