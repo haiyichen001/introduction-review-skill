@@ -146,9 +146,72 @@ Ask the user for THE key differentiator of their work if not yet stated:
 
 Then write the draft. Default length: ~800-1200 words, adjust per venue.
 
+#### CRITICAL: Placeholder System — Never Hardcode Citation Numbers
+
+**This is the most important mechanism in this skill. It solves the problem of renumbering when citations are added, removed, or reordered.**
+
+During drafting and editing, ALWAYS use symbolic placeholders — NEVER write `[1]`, `[2]`, `[3]` directly into the text. The numbering pass happens AFTER the content is stable.
+
+**Placeholder format**: `[CITE:lastnameYEAR]` (lowercase, no spaces)
+
+```
+Drafting example:
+"Neural mesh segmentation has been widely studied [CITE:smith2023].
+Point cloud methods offer an alternative [CITE:jones2022].
+Smith et al. built on earlier mesh-based work [CITE:smith2023]
+to propose a hybrid approach [CITE:lee2021]."
+```
+
+**Internal mapping table** — maintained throughout the session:
+
+| Placeholder | Paper | First Appears At | Assigned # |
+|-------------|-------|------------------|------------|
+| `[CITE:smith2023]` | Smith et al., "Mesh Segmentation with GNNs" (2023) | Paragraph 2 | (pending) |
+| `[CITE:jones2022]` | Jones & Lee, "Point Cloud Understanding" (2022) | Paragraph 3 | (pending) |
+| `[CITE:lee2021]` | Lee et al., "Hybrid Segmentation" (2021) | Paragraph 3 | (pending) |
+
+**Numbering pass** (run after draft is confirmed, or after any edit that changes citation order):
+
+1. Scan the draft text left-to-right for first occurrence of each distinct placeholder
+2. Assign `[1]` to the first distinct placeholder that appears, `[2]` to the second, etc.
+3. Replace all occurrences of each placeholder with its assigned number
+4. The reference list is auto-generated in `[1]`, `[2]`, `[3]`... order matching the numbering
+
+```
+After numbering pass:
+"Neural mesh segmentation has been widely studied [1].
+Point cloud methods offer an alternative [2].
+Smith et al. built on earlier mesh-based work [1]
+to propose a hybrid approach [3]."
+
+Reference list:
+[1] J. Smith et al., "Mesh Segmentation with GNNs," ...
+[2] A. Jones and B. Lee, "Point Cloud Understanding," ...
+[3] C. Lee et al., "Hybrid Segmentation," ...
+```
+
+**Renumbering after edits** — when the user adds or removes a citation:
+
+1. If a new placeholder is added → insert it into the mapping table → re-run the FULL numbering pass. All numbers may shift. This is expected and the system handles it.
+2. If a placeholder is removed → delete it from the mapping table → re-run the FULL numbering pass.
+3. The reference list is always regenerated from scratch after each numbering pass.
+
+```
+Example: User adds a new citation [CITE:wang2024] before [CITE:smith2023].
+
+Before: [CITE:smith2023]→[1], [CITE:jones2022]→[2], [CITE:lee2021]→[3]
+After:  [CITE:wang2024]→[1], [CITE:smith2023]→[2], [CITE:jones2022]→[3], [CITE:lee2021]→[4]
+
+All numbers shifted. Reference list regenerated.
+```
+
+**The user NEVER manually types citation numbers. The system always assigns them.**
+
+When showing the draft to the user for review, show the numbered version (after running the numbering pass). But internally, always work with placeholders. If the user requests an edit, revert to placeholder mode, make the change, re-run numbering.
+
 #### CRITICAL: Citation Numbering Rules
 
-**Citations MUST be numbered in strict sequential order of first appearance in the text.**
+**After the numbering pass, citations MUST be in strict sequential order of first appearance in the text.**
 
 - The first paper cited in the body text gets `[1]`, the second distinct paper cited gets `[2]`, etc.
 - Once a paper is assigned a number, reuse that number every time you cite it again.
@@ -234,18 +297,41 @@ When pointing out limitations of existing research, use measured, evidence-based
 
 ### Phase 4: Review & Polish
 
+Before showing the draft to the user, run the numbering pass to replace all placeholders with real numbers.
+
 ```
+--- Numbering Pass ---
+Scanning placeholder order...
+  [CITE:smith2023] → first appears in paragraph 2 → assigned [1]
+  [CITE:jones2022] → first appears in paragraph 3 → assigned [2]
+  [CITE:lee2021]   → first appears in paragraph 3 → assigned [3]
+All placeholders replaced. Reference list generated.
+
 --- Reviewing Draft ---
-- Citation numbering: OK (sequential [1]-[8])
-- Citation coverage: 8/8 citations linked to papers
+- Citation numbering: OK (sequential [1]-[3])
+- Citation coverage: 3/3 citations linked to papers
+- Citation group size: all within limit
 - Structure check: OK
 - Tone check: all critiques use diplomatic language
 - Flow check: transition between related work and our approach could be stronger
 ```
 
+Show the numbered draft to the user for review.
+
+**If user requests edits** (add/remove/reorder citations):
+1. Revert the affected section back to placeholder form
+2. Apply the edit with `[CITE:key]` placeholders
+3. Re-run the numbering pass — ALL numbers may shift, this is expected
+4. Regenerate the reference list
+5. Show the updated draft
+
+**If no citation changes**, iterate on wording directly.
+
 Ask the user for feedback. Iterate on specific sections rather than rewriting the whole thing.
 
 ### Phase 5: Generate References
+
+The reference list is auto-generated from the placeholder mapping table after each numbering pass. No manual formatting.
 
 Determine the correct format based on the user's target venue. See the [Citation Format Reference](#citation-format-reference-by-venue) section below for detailed rules.
 
@@ -253,17 +339,16 @@ Determine the correct format based on the user's target venue. See the [Citation
 --- Generating References ---
 Venue detected: IEEE Conference
 Format: IEEE (sequential numbering, square brackets)
-Extracting citations in order of first appearance...
-  [1] → Smith et al., "Mesh Segmentation with GNNs", first cited in paragraph 2
-  [2] → Jones and Lee, "Point Cloud Understanding", first cited in paragraph 3
-  ...
-All 8 citations mapped. Reference list in sequential order.
+Mapping table → numbering pass → reference list:
 
-References (IEEE):
-[1] J. Smith et al., "Neural Mesh Segmentation with GNNs," IEEE Trans. Vis. Comput. Graph., vol. 27, no. 3, pp. 1234-1245, 2021.
-[2] A. Jones and B. Lee, "Point Cloud Understanding via Transformers," in Proc. CVPR, 2022, pp. 567-570.
-[3] ...
+  [CITE:smith2023] → [1] J. Smith et al., "Mesh Segmentation with GNNs," ...
+  [CITE:jones2022] → [2] A. Jones and B. Lee, "Point Cloud Understanding," ...
+  [CITE:lee2021]   → [3] C. Lee et al., "Hybrid Segmentation," ...
+
+All 3 citations mapped. Reference list in sequential order.
 ```
+
+**If the user edits citations in Phase 4**, the reference list is regenerated automatically after the re-numbering pass.
 
 If the user didn't specify a format, ask: "Which target venue? Options: IEEE / SCI Journal / EI Journal / Chinese Thesis / APA / MLA / Chicago / BibTeX (LaTeX)."
 
@@ -271,11 +356,12 @@ If the user didn't specify a format, ask: "Which target venue? Options: IEEE / S
 
 ```
 --- Citation Audit ---
+Placeholder check:       8 placeholders → 8 resolved → 0 orphan placeholders
 In-text citations:       8
 Reference entries:       8
-Sequential order check:  PASS ([1]→[8], no gaps, no duplicates)
-Orphan references:       0  (in bibliography but not cited)
-Missing references:      0  (cited but not in bibliography)
+Sequential order check:  PASS ([1]→[8], no gaps, no skipped numbers)
+Orphan references:       0  (in reference list but not cited in text)
+Missing references:      0  (cited in text but not in reference list)
 Citation group size:     PASS (max 3 per bracket, all within limit)
 Tone check:              PASS (all critiques diplomatically phrased)
 Unsupported claims:      1  — line 45 claims "SOTA performance" without citation
@@ -428,7 +514,8 @@ Always pair criticism with acknowledgment. The structure is: "X achieved [positi
 
 ## Key Principles
 
-- **Sequential numbering is law**: citations `[1]`, `[2]`, `[3]`... appear in strict order of first mention in the text. References at the end also numbered `[1]`, `[2]`, `[3]`... in that same order. No exceptions.
+- **Placeholder system**: draft and edit with `[CITE:lastnameYEAR]` placeholders, never hardcoded numbers. Numbering pass runs after content is stable. Renumbering is automatic when citations are added, removed, or reordered.
+- **Sequential numbering is law**: after the numbering pass, citations `[1]`, `[2]`, `[3]`... appear in strict order of first mention in the text. References at the end also numbered `[1]`, `[2]`, `[3]`... in that same order.
 - **Citation group limit**: max 3 papers per bracket by default, absolute max 5. Exceeding 3 triggers `AskUserQuestion` confirmation.
 - **Critique through comparison, not attack**: point out scope limitations and trade-offs, not failures. Use "while/however/although" structures.
 - **Traceability first**: every citation must resolve to a real paper with verified metadata.
