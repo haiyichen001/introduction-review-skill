@@ -342,20 +342,21 @@ Options:
   - "Not yet, let me review placeholders first"
 ```
 
-If user chooses "Yes", run the numbering pass using `scripts/cite_scan.py`. This is deterministic — no LLM guessing. Run the script and stream its output directly to the user:
+If user chooses "Yes", run the numbering pass with **Monitor** for real-time streaming output:
+
+→ First, save the draft with placeholders to a temp file.
+→ Then start Monitor with `scripts/cite_stream.py`:
 
 ```
---- Running Numbering Pass (cite_scan.py) ---
+Monitor command: python scripts/cite_stream.py <draft_file>
 ```
-→ Execute: `python scripts/cite_live.py <draft_file>`
-→ OR: `echo "<draft_text>" | python scripts/cite_live.py` if draft is in-memory
 
-The script outputs three progressive tables (rich-formatted):
-  1. **Citation Scan** — all [CITE:xxx] placeholders found, in first-appearance order
-  2. **Number Assignment** — mapping table: # | Key | Paper | Meta
-  3. **Numbered Text** — full draft with [1][2][3]... citations highlighted
+The script outputs one line at a time with `flush()`. Monitor streams each line to the conversation as it arrives. The user sees:
+  1. **Scan phase** — each placeholder found, one per line
+  2. **Mapping phase** — each [#] ← [CITE:xxx] assignment
+  3. **Numbered text** — final draft with [1][2][3]...
 
-Stream the script's stdout to the user in real-time. The script prints everything — scan order, mapping, replacements, numbered text. After the script completes, run it again with `--json` to get structured data for Phase 5 reference generation.
+Output stays in the conversation after completion. Parse the JSON at the end for Phase 5.
 
 If user chooses "Not yet", show the draft with placeholders visible for their review.
 
@@ -439,5 +440,6 @@ All checks passed. 1 warning: add citation for the SOTA claim on line 45.
 - `references/diplomatic-critique.md` — phrase bank for diplomatic literature review writing
 
 **Scripts** (deterministic, no LLM guessing):
-- `scripts/cite_live.py` — rich dashboard: scans, maps, and numbers citations with progressive tables (use this in Phase 4)
+- `scripts/cite_stream.py` — **primary**: real-time streaming via Monitor, line-by-line output for live conversation display
+- `scripts/cite_live.py` — rich dashboard with formatted tables (for direct terminal use)
 - `scripts/cite_scan.py` — plain-text version for headless/pipe usage

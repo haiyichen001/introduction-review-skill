@@ -88,6 +88,7 @@ def main():
         ])
     console.print(scan_table)
     console.print()
+    time.sleep(2)  # keep scan status visible
 
     # === STEP 2: Number assignment ===
     map_table = Table(
@@ -118,7 +119,7 @@ def main():
     write_status(status_lines)
     console.print(map_table)
     console.print()
-    time.sleep(0.5)  # let status line pick up the state
+    time.sleep(3)  # keep status line visible for user to see
 
     # === STEP 3: Replacement + numbered text ===
     def replacer(match):
