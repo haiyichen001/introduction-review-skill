@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Real-time streaming citation dashboard.
-Outputs one line at a time with flush() — designed for Monitor streaming.
+Outputs one line at a time with flush() + delay ->designed for Monitor streaming.
 
 Usage:
     python cite_stream.py <input_file>
@@ -11,15 +11,17 @@ import re
 import sys
 import json
 import os
+import time
 from collections import OrderedDict
 
 PLACEHOLDER_RE = re.compile(r'\[CITE:([a-zA-Z0-9_\-]+)\]')
 
 
 def flush(line):
-    """Print and force flush so Monitor picks it up immediately."""
+    """Print, flush, and pause so Monitor sends each line as a separate event."""
     sys.stdout.write(line + '\n')
     sys.stdout.flush()
+    time.sleep(0.25)  # ensures Monitor treats each line as a separate event
 
 
 def scan_order(text):
@@ -56,7 +58,7 @@ def main():
         info = paper_info.get(key, {})
         label = info.get('label', key)
         year = info.get('year', '')
-        line = f'  {placeholders[key]}. [CITE:{key}] — {label}'
+        line = f'  {placeholders[key]}. [CITE:{key}] ->{label}'
         if year:
             line += f' ({year})'
         flush(line)
@@ -67,7 +69,7 @@ def main():
     mapping = {}
     for key in ordered_keys:
         mapping[key] = placeholders[key]
-        flush(f'  [{mapping[key]}] ← [CITE:{key}]')
+        flush(f'  [{mapping[key]}] <- [CITE:{key}]')
     flush('')
 
     # === STEP 3: Numbered Text ===
