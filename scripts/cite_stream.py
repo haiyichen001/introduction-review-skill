@@ -21,7 +21,7 @@ def flush(line):
     """Print, flush, and pause so Monitor sends each line as a separate event."""
     sys.stdout.write(line + '\n')
     sys.stdout.flush()
-    time.sleep(0.25)  # ensures Monitor treats each line as a separate event
+    time.sleep(0.4)  # ensures Monitor treats each line as a separate event, avoids rate limit
 
 
 def scan_order(text):
@@ -58,7 +58,7 @@ def main():
         info = paper_info.get(key, {})
         label = info.get('label', key)
         year = info.get('year', '')
-        line = f'  {placeholders[key]}. [CITE:{key}] ->{label}'
+        line = f'  {placeholders[key]}. [CITE:{key}] | {label}'
         if year:
             line += f' ({year})'
         flush(line)
@@ -69,7 +69,7 @@ def main():
     mapping = {}
     for key in ordered_keys:
         mapping[key] = placeholders[key]
-        flush(f'  [{mapping[key]}] <- [CITE:{key}]')
+        flush(f'  [{mapping[key]}] = [CITE:{key}]')
     flush('')
 
     # === STEP 3: Numbered Text ===
