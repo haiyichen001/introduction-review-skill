@@ -347,14 +347,13 @@ If user chooses "Yes", run the numbering pass using `scripts/cite_scan.py`. This
 ```
 --- Running Numbering Pass (cite_scan.py) ---
 ```
-→ Execute: `python scripts/cite_scan.py <draft_file>`
-→ OR: `echo "<draft_text>" | python scripts/cite_scan.py` if draft is in-memory
+→ Execute: `python scripts/cite_live.py <draft_file>`
+→ OR: `echo "<draft_text>" | python scripts/cite_live.py` if draft is in-memory
 
-The script outputs step-by-step:
-  1. Scans for all [CITE:xxx] placeholders, prints each in order of first appearance
-  2. Builds and prints the mapping table (placeholder → number)
-  3. Replaces each occurrence one by one, marking reuse
-  4. Outputs the complete numbered text
+The script outputs three progressive tables (rich-formatted):
+  1. **Citation Scan** — all [CITE:xxx] placeholders found, in first-appearance order
+  2. **Number Assignment** — mapping table: # | Key | Paper | Meta
+  3. **Numbered Text** — full draft with [1][2][3]... citations highlighted
 
 Stream the script's stdout to the user in real-time. The script prints everything — scan order, mapping, replacements, numbered text. After the script completes, run it again with `--json` to get structured data for Phase 5 reference generation.
 
@@ -440,4 +439,5 @@ All checks passed. 1 warning: add citation for the SOTA claim on line 45.
 - `references/diplomatic-critique.md` — phrase bank for diplomatic literature review writing
 
 **Scripts** (deterministic, no LLM guessing):
-- `scripts/cite_scan.py` — placeholder scanner + numbering pass engine. Always use this for numbering, never do it manually.
+- `scripts/cite_live.py` — rich dashboard: scans, maps, and numbers citations with progressive tables (use this in Phase 4)
+- `scripts/cite_scan.py` — plain-text version for headless/pipe usage
