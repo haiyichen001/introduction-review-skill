@@ -76,18 +76,14 @@ def main():
     placeholders = scan_order(text)
     mapping = {k: placeholders[k] for k in placeholders}
 
-    # Detect language: if >30% chars are CJK, use Chinese headers
-    cjk = sum(1 for c in text if '一' <= c <= '鿿')
-    zh = cjk > len(text) * 0.3
-
-    num_hdr = '序号' if zh else '#'
-    author_hdr = '作者' if zh else 'Author'
-    ctx_hdr = '正文引用(限50字)' if zh else 'Context (50 chars)'
-    status_hdr = '状态' if zh else 'Status'
-    status_ok = '正确' if zh else 'OK'
-    status_reuse = '重复引用' if zh else 'Reuse'
-    status_bad = '顺序错误' if zh else 'Bad Order'
-    title = '参考文献对照表' if zh else 'Reference Table'
+    num_hdr = '#'
+    author_hdr = 'Author'
+    ctx_hdr = 'Context (50 chars)'
+    status_hdr = 'Status'
+    status_ok = 'OK'
+    status_reuse = 'Reuse'
+    status_bad = 'Bad Order'
+    title = 'Reference Table'
 
     # Build flat list of all occurrences with context
     occurrences = []
