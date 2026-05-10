@@ -342,17 +342,15 @@ Options:
   - "Not yet, let me review placeholders first"
 ```
 
-If user chooses "Yes", run the numbering pass with `cite_live.py` (three rich-formatted tables):
+If user chooses "Yes", run the numbering pass:
 
 → Save the draft with placeholders to a temp file.
-→ Run: `python scripts/cite_live.py <draft_file>`
+→ `python scripts/cite_table.py <draft_file>` — outputs the **reference table**
+→ `python scripts/cite_scan.py <draft_file>` — outputs the **numbered text**
 
-The script outputs three progressive tables:
-  **Step 1/3 — Citation Scan**: all [CITE:xxx] found, in first-appearance order
-  **Step 2/3 — Number Assignment**: mapping table # | Key | Paper | Meta
-  **Step 3/3 — Numbered Text**: full draft with [1][2][3]... citations
+The reference table has 4 columns: 序号 | 作者 | 正文引用(50字) | 状态. Status: "正确" for first occurrence, "重复引用(首次为[N])" for reuse, "顺序错误" if out of order.
 
-Parse the trailing JSON for Phase 5 reference generation.
+Parse the trailing JSON from cite_scan.py for Phase 5 reference generation.
 
 If user chooses "Not yet", show the draft with placeholders visible for their review.
 
@@ -435,6 +433,7 @@ All checks passed. 1 warning: add citation for the SOTA claim on line 45.
 - `references/citation-formats.md` — IEEE, SCI, EI, GB/T 7714, APA, MLA, Chicago, ACM format rules
 - `references/diplomatic-critique.md` — phrase bank for diplomatic literature review writing
 
-**Scripts** (deterministic, no LLM guessing):
-- `scripts/cite_live.py` — **primary**: rich-formatted progressive tables (Scan → Mapping → Numbered Text), use in Phase 4
-- `scripts/cite_scan.py` — plain-text version for headless/pipe usage
+**Scripts** (hard-coded, deterministic — NEVER do this manually, scripts prevent LLM errors):
+- `scripts/cite_table.py` — **primary**: reference table (序号|作者|正文引用|状态), use in Phase 4
+- `scripts/cite_scan.py` — numbered text output + JSON mapping for Phase 5
+- `scripts/cite_live.py` — rich-formatted progressive tables (optional, for visual overview)
