@@ -21,56 +21,57 @@ Use this skill when the user:
 
 ### Phase 0: Check & Install MCP Tools
 
-**This runs FIRST, before anything else. Show each check individually with a checkmark so the user sees liveness — don't batch them all at once.**
+**This runs FIRST. You MUST execute each check with an actual tool call — NOT just print a summary. The user must see each line appear one at a time as the check happens.**
 
-Print the skill banner and check each tool one by one:
+**Execution protocol (DO NOT SKIP):**
+
+Step 0: Print the banner.
+Step 1: Print `Checking required tools...`
+Step 2: For EACH of the 4 required MCPs, do a real check (call `ListMcpResourcesTool` with the server name, or check the system prompt for `mcp__<server>__*` tools). After EACH check, print the result line immediately. Do NOT batch.
+Step 3: If all 4 pass, print `All required MCPs ready.`
+Step 4: If any is missing, install it (detect config path, run installer), showing progress per tool.
+
+**Required output format (one line at a time):**
 
 ```
 === Introduction Review Skill ===
 Checking required tools...
-  arxiv ............... found ✓
-  scholar ............. found ✓
-  paper-search ........ found ✓
-  pdf-reader .......... found ✓
+  arxiv ........................................ found ✓
+  scholar ...................................... found ✓
+  paper-search ................................. found ✓
+  pdf-reader ................................... found ✓
 All required MCPs ready.
 ```
 
-Required MCP servers (4 total):
-
-| MCP Server | Purpose | Required |
-|------------|---------|----------|
-| `arxiv` | Search & read arXiv papers | Yes |
-| `scholar` | Search Semantic Scholar, citations | Yes |
-| `paper-search` | Search arXiv/bioRxiv/medRxiv/PubMed/Google Scholar | Yes |
-| `pdf-reader` | Read local PDF files | Yes |
-
-**Check step**: Call `ListMcpResourcesTool` to see what's currently connected, then map each required server against available tools. Print each line as it completes — do NOT wait for all checks before showing output.
-
-**If any MCP is missing**, output:
+**If a tool is missing**, replace the `found ✓` line with:
 
 ```
-  arxiv ............... missing ✗ — installing...
+  arxiv ........................................ missing ✗ — installing via Smithery...
+                                          npx @anthropic-ai/mcp-installer add arxiv
+  arxiv ........................................ done ✓
 ```
 
-Then install it:
+**Required MCP servers (4 total):**
+
+| MCP Server | Check method |
+|------------|-------------|
+| `arxiv` | Look for `mcp__arxiv__*` in available tools |
+| `scholar` | Look for `mcp__scholar__*` in available tools |
+| `paper-search` | Look for `mcp__paper-search__*` in available tools |
+| `pdf-reader` | Look for `mcp__pdf-reader__*` in available tools |
+
+**Install missing MCPs**:
 
 1. Detect where the user installs MCPs:
    - Check `C:\Users\<user>\.claude\claude_desktop_config.json` (Claude Desktop)
    - Check `C:\Users\<user>\.claude\mcp.json` (Claude Code project)
    - Check `C:\Users\<user>\AppData\Roaming\Claude\mcp.json` (Claude Code user)
-   - Print the detected location
 
-2. Install and show progress:
-
-```
-  arxiv ............... installing via Smithery...
-                        npx @anthropic-ai/mcp-installer add arxiv
-                        done ✓
-```
+2. Install: `npx @anthropic-ai/mcp-installer add <server-name>`
 
 3. If automatic install fails, print the exact command the user should run manually.
 
-4. After install, verify all tools again and print the final status block.
+4. Verify again after install.
 
 ### Phase 1: Detect Intent
 
