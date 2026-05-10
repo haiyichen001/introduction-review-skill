@@ -60,11 +60,14 @@ def format_author(key):
 
 
 def main():
-    if len(sys.argv) > 1:
+    if len(sys.argv) > 1 and sys.argv[1] not in ('--help', '-h'):
         with open(sys.argv[1], 'r', encoding='utf-8') as f:
             text = f.read()
     else:
         text = sys.stdin.read()
+
+    import os
+    out_file = os.path.join(os.path.dirname(__file__), 'cite_output.txt')
 
     placeholders = scan_order(text)
     mapping = {k: placeholders[k] for k in placeholders}
@@ -86,12 +89,13 @@ def main():
         else:
             occ['status'] = 'Reuse'
 
-    # Compact plain-text table
-    print()
-    print(DISCLAIMER)
-    print()
-    print(f'{"#":<4} {"Author":<14} {"Context (50 chars)":<52} {"Status":<10}')
-    print('-' * 82)
+    # Build table lines
+    lines = []
+    lines.append('')
+    lines.append(DISCLAIMER)
+    lines.append('')
+    lines.append(f'{"#":<4} {"Author":<14} {"Context (50 chars)":<52} {"Status":<10}')
+    lines.append('-' * 82)
 
     seen = set()
     for occ in occurrences:
@@ -99,10 +103,16 @@ def main():
         if key in seen:
             continue
         seen.add(key)
-        print(f'{occ["num"]:<4} {format_author(key):<14} {occ["context"]:<52} {occ["status"]:<10}')
+        lines.append(f'{occ["num"]:<4} {format_author(key):<14} {occ["context"]:<52} {occ["status"]:<10}')
 
-    print('-' * 82)
-    print(f'{len(seen)} references total.')
+    lines.append('-' * 82)
+    lines.append(f'{len(seen)} references total.')
+
+    # Print to stdout + write to file for Read tool relay
+    output = '\n'.join(lines)
+    print(output)
+    with open(out_file, 'w', encoding='utf-8') as f:
+        f.write(output)
 
 
 if __name__ == '__main__':
