@@ -12,6 +12,7 @@ import re
 import sys
 import json
 import os
+import tempfile
 from collections import OrderedDict
 
 from rich.console import Console
@@ -20,6 +21,17 @@ from rich.panel import Panel
 from rich.text import Text
 
 PLACEHOLDER_RE = re.compile(r'\[CITE:([a-zA-Z0-9_\-]+)\]')
+
+STATUS_FILE = os.path.join(tempfile.gettempdir(), 'cite_live_state.txt')
+
+
+def write_status(lines):
+    """Write status to file for Claude Code status line to pick up."""
+    try:
+        with open(STATUS_FILE, 'w', encoding='utf-8') as f:
+            f.write('\n'.join(lines))
+    except Exception:
+        pass  # best-effort, don't crash on status file write failure
 
 
 def scan_order(text):
@@ -69,6 +81,10 @@ def main():
     scan_table.add_column('Placeholder', style='yellow', width=28)
     for i, key in enumerate(ordered_keys):
         scan_table.add_row(str(placeholders[key]), f'[CITE:{key}]')
+        write_status([
+            '\033[1;36m Cite Scan\033[0m',
+            f'\033[33m[{i+1}/{total}]\033[0m [CITE:{key}]'
+        ])
     console.print(scan_table)
     console.print()
 
@@ -83,6 +99,7 @@ def main():
     map_table.add_column('Paper', style='white', width=38)
     map_table.add_column('Meta', style='dim', width=15)
 
+    status_lines = ['\033[1;36m Cite Map\033[0m']
     for key in ordered_keys:
         mapping[key] = placeholders[key]
         info = paper_info.get(key, {})
@@ -94,6 +111,10 @@ def main():
             paper_label,
             meta,
         )
+        status_lines.append(
+            f'\033[1;32m[{mapping[key]}]\033[0m \033[33m[CITE:{key}]\033[0m  \033[37m{paper_label}\033[0m'
+        )
+    write_status(status_lines)
     console.print(map_table)
     console.print()
 
@@ -110,6 +131,16 @@ def main():
         title='[bold cyan]Step 3/3: Numbered Text[/]',
         border_style='green',
     ))
+
+    # Clear status file — task complete
+    write_status(['\033[1;32m Cite Done\033[0m'])
+    # Let status line show completion briefly, then clean up
+    import time
+    time.sleep(2)
+    try:
+        os.remove(STATUS_FILE)
+    except Exception:
+        pass
 
     # Output JSON for downstream (Phase 5)
     print('\n--- JSON ---')
