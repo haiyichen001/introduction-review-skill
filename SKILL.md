@@ -325,32 +325,12 @@ point clouds well. Recent methods combine both [1-4].
 
 When pointing out limitations of existing research, use measured, evidence-based language. Never use aggressive or dismissive terms.
 
-**Forbidden phrases (too harsh):**
-- "X completely fails to..."
-- "X ignores/neglects..."
-- "X is fundamentally flawed..."
-- "X makes no attempt to..."
-- "X is wrong about..."
+Core rules:
+- No: "X completely fails to...", "X ignores...", "X fundamentally flawed...", "X makes no attempt..."
+- Yes: paired acknowledgment+critique ("While X achieved Y, their approach has limitations when...")
+- Compare scope and trade-offs, never condemn
 
-**Recommended phrasing:**
-
-| Instead of | Use |
-|------------|-----|
-| X failed to consider Y | X did not account for Y / Y was not within the scope of X |
-| X's method is wrong | X's approach has limitations when applied to... |
-| Nobody has studied this | Few studies have explored... / Research on X remains limited |
-| X is inadequate | X leaves room for improvement in... / X may not fully capture... |
-| X ignores Z | Prior work has primarily focused on A rather than Z |
-
-**Structural patterns for diplomatic critique:**
-
-1. **Acknowledge then extend**: "While Smith [1] demonstrated the effectiveness of GNNs on manifold meshes, their evaluation was limited to synthetic datasets. Real-world scans introduce additional challenges such as noise and missing data that warrant further investigation."
-
-2. **Compare, don't condemn**: "Method A [2] achieves high accuracy but requires manual parameter tuning, whereas method B [3] is fully automatic but trades off precision. Neither fully addresses the need for an adaptive, high-precision automated solution."
-
-3. **Scope limitation, not failure**: "The scope of [4] was limited to single-object scenes. Multi-object segmentation introduces inter-object occlusion, a scenario not addressed in that work."
-
-4. **Cite self-admitted limitations**: "As noted by the authors themselves [5], their approach does not scale beyond 10K vertices."
+**Load `references/diplomatic-critique.md` for the full phrase bank** — includes gap-highlighting templates, acknowledgment-before-critique examples, and forbidden phrase replacements.
 
 ### Phase 4: Review & Polish
 
@@ -394,7 +374,7 @@ Ask the user for feedback. Iterate on specific sections rather than rewriting th
 
 The reference list is auto-generated from the placeholder mapping table after each numbering pass. No manual formatting.
 
-Determine the correct format based on the user's target venue. See the [Citation Format Reference](#citation-format-reference-by-venue) section below for detailed rules.
+**Load `references/citation-formats.md` for detailed formatting rules per venue** (IEEE, SCI/Vancouver, EI, GB/T 7714, APA, MLA, Chicago, ACM).
 
 ```
 --- Generating References ---
@@ -438,147 +418,6 @@ All checks passed. 1 warning: add citation for the SOTA claim on line 45.
 
 ---
 
-## Citation Format Reference by Venue
-
-### General Principle: Sequential Numbering
-
-All numbered citation systems (IEEE, Vancouver, GB/T 7714, EI, most SCI journals) follow the same core rule:
-
-> **References are numbered in the order they first appear in the text. The reference list at the end mirrors this order. A source keeps the same number every time it is cited.**
-
-### Citation Format Comparison by Venue
-
-| Venue | In-Text Style | Multiple Cites | Reference List Order | Note |
-|-------|--------------|----------------|---------------------|------|
-| **IEEE** | `[1]` square brackets, inline on text line | `[1,3,5]` or `[1]-[3]` for consecutive | Sequential by appearance | Widely used in engineering, CS |
-| **SCI (Vancouver)** | `[1]` or `(1)` depending on journal | `[1,2]` or `[1-3]` | Sequential by appearance | Common in biomedical/physical sciences |
-| **SCI (Elsevier numeric)** | `[1]` square brackets | `[1,2,5]` or `[1-3]` | Sequential by appearance | Most Elsevier journals |
-| **EI Journal** | `[1]` square brackets, sequential | `[1,2]` or `[1-3]` | Sequential by appearance | 4-8 references minimum recommended |
-| **Chinese Thesis (GB/T 7714)** | `[1]` square brackets, or superscript `¹` | `[1,2]` or `[1-3]` for consecutive | **Sequential by appearance** (顺序编码制) | See detailed rules below |
-| **APA 7th** | `(Author, Year)` parenthetical | `(Smith, 2020; Jones, 2021)` | **Alphabetical by author** | Not a numbered system; not recommended for theses |
-| **MLA 9th** | `(Author Page)` | — | Alphabetical | Humanities |
-| **Chicago** | Footnotes or author-date | — | Alphabetical (author-date) or by footnote order | History, arts |
-| **ACM** | `[1]` square brackets | `[1,2]` | Sequential by appearance | Computing |
-
-### IEEE Detailed Rules
-
-- In-text: Bracketed numbers `[1]`, inline (not superscript), before punctuation, space before bracket: `...as shown in [1].`
-- Reference list: Numbered `[1]`, `[2]`, `[3]`... in order of first appearance
-- Author format: Initials + Last name (e.g., `J. Smith`). Up to 6 authors listed, then `et al.`
-- Journal article: `[#] A. Author, "Title," *Journal Abbrev.*, vol. X, no. Y, pp. Z, Year.`
-- Conference: `[#] A. Author, "Title," in *Proc. Conf. Name*, City, Year, pp. X-Y.`
-- Same source reused: use the original number. Do NOT renumber.
-
-### SCI / Vancouver Detailed Rules
-
-- In-text: Numbers in `[1]` brackets or `(1)` parentheses. Check journal Guide for Authors.
-- Sequential numbering by first appearance.
-- Author format: Last name + Initials. Up to 6 authors, then `et al.`
-- Journal titles abbreviated per Index Medicus / NLM.
-- Journal article: `[#] Author AB, Author CD. Title. *J Abbrev.* Year;Vol(Issue):Pages.`
-- Some Elsevier journals use "numeric, with titles" style — includes article titles in the reference.
-
-### EI Journal Detailed Rules
-
-- In-text: `[1]`, `[2]`, `[3]` square brackets, sequential. NOT author-year, NOT footnotes/endnotes.
-- Reference list: sequential numbering matching text order.
-- Minimum 4-8 references recommended.
-- Journal: `[#] Author, "Title," *Journal Name*, vol. X, no. Y, pp. Z, Year.`
-- Conference: `[#] Author, "Title," *Conference Name*, pp. X-Y, Date.`
-- Book: `[#] Author, *Title*, Edition. City: Publisher, Year, pp. X-Y.`
-- EI收录的中文期刊：优先使用英文题名著录。
-
-### Chinese Thesis (GB/T 7714-2015) Detailed Rules
-
-Chinese academic theses follow the national standard **GB/T 7714-2015** (现行有效, 2025年仍适用).
-
-**Two systems exist**:
-1. **顺序编码制 (Sequential Numbering)** — Most common for theses. Citations numbered `[1]`, `[2]`, `[3]` in order of first appearance.
-2. **著者-出版年制 (Author-Year)** — Less common. Uses `(Author, Year)` format.
-
-**For theses using 顺序编码制**:
-
-- **In-text citation placement**:
-  - 右上角标形式 (superscript): `...已有研究¹表明...`
-  - 正文行内方括号: `...已有研究[1]表明...`
-  - 引用连续文献: `[1-3]` (consecutive numbers joined by hyphen)
-  - 引用不连续文献: `[1,3,5]` (non-consecutive numbers separated by comma)
-  - 同时引用连续和不连续: `[1-3,5]`
-
-- **Reference list format** (sequential order matching text):
-
-| 文献类型 | 格式 |
-|----------|------|
-| 期刊 [J] | `[序号] 作者. 题名[J]. 刊名, 年, 卷(期): 起止页码.` |
-| 专著 [M] | `[序号] 作者. 书名[M]. 出版地: 出版社, 年: 页码.` |
-| 会议 [C] | `[序号] 作者. 题名[C]. 会议名, 地点, 年: 页码.` |
-| 学位论文 [D] | `[序号] 作者. 题名[D]. 学校所在地: 学校, 年.` |
-| 专利 [P] | `[序号] 专利权人. 专利名[P]. 专利号, 日期.` |
-| 电子资源 [EB/OL] | `[序号] 作者. 题名[EB/OL]. [引用日期]. URL.` |
-
-- **Author formatting**: 3 authors or fewer → list all. More than 3 → list first 3 + "等" (or "et al." for English).
-- **English author names**: Last name first, initials after. Example: `Smith J, Jones A B, Lee C, et al.`
-- **Bilingual references**: If required, cite in original language first, then in translation.
-
-### APA 7th (Author-Year) — For Reference
-
-APA is NOT a numbered system. References are alphabetical by author last name. Only use APA if:
-- The user explicitly requests it
-- The target journal requires APA
-- The user is in psychology, social sciences, education
-
-**In-text**: `(Smith, 2020)` or `Smith (2020)`
-**Reference list**: Alphabetical by author, not numbered.
-**Multiple citations**: `(Smith, 2020; Jones, 2021)` — alphabetical, separated by semicolons.
-
-### Determining Which Format to Use
-
-Ask the user (or infer from context):
-
-| User says | Apply |
-|-----------|-------|
-| "学位论文" / "毕业论文" / "硕士论文" / "博士论文" | GB/T 7714 顺序编码制 |
-| "IEEE 期刊" / "IEEE 会议" | IEEE |
-| "SCI 期刊" / "Elsevier" / "Springer" | Vancouver / Elsevier numeric |
-| "EI 期刊" / "EI 会议" | EI sequential numbering |
-| "APA" / "心理学期刊" | APA 7th |
-| "BibTeX" / "LaTeX" | BibTeX |
-
----
-
-## Diplomatic Critique Phrase Bank
-
-### Highlighting Gaps (Not Failures)
-
-| Situation | Recommended Phrasing |
-|-----------|---------------------|
-| A topic is understudied | "Few studies have explored..." / "Research on X remains limited..." |
-| A method has a limitation | "While effective for [scenario A], this approach may not generalize to [scenario B]..." |
-| Conflicting findings exist | "Findings on X remain inconclusive. Smith [1] reports A, whereas Jones [2] finds B, suggesting that..." |
-| A study used small data | "The generalizability of these findings is constrained by the limited sample size..." |
-| An assumption is restrictive | "This framework operates under the assumption that..., which may not hold in..." |
-| A method is outdated | "Early approaches to X primarily relied on [old method]. Recent advances in [new method] offer opportunities to..." |
-| Results are inconsistent | "There is no consensus on X. Studies using method A report Y [1,2], while those using method B find Z [3]." |
-
-### Acknowledging Contributions Before Critiquing
-
-Always pair criticism with acknowledgment. The structure is: "X achieved [positive], however/although/despite [limitation]."
-
-- "Smith [1] pioneered the use of GNNs for mesh segmentation, achieving state-of-the-art results on clean synthetic data. However, their method assumes watertight input meshes, which rarely occur in real-world 3D scans."
-- "The dataset introduced by Jones [2] has become a standard benchmark. While comprehensive, it focuses exclusively on indoor objects and does not represent outdoor or large-scale scenes."
-- "Lee [3] proposed an elegant solution for real-time segmentation. The trade-off is a 15% drop in accuracy compared to offline methods, which may be unacceptable for precision-critical applications."
-
-### DO NOT Use These Phrases
-
-- "To the best of our knowledge, no prior work has..." → Replace with "We are not aware of prior work that specifically addresses..." (softer, and factually honest)
-- "X fails to..." → Replace with "X does not..."
-- "X is unable to..." → Replace with "X is not designed to handle..."
-- "X ignores..." → Replace with "X does not account for..."
-- "Surprisingly, X did not consider..." → Remove "Surprisingly" — it reads as condescending
-- "It is astonishing that..." → Never use. Subjective, unprofessional.
-
----
-
 ## Key Principles
 
 - **Placeholder system**: draft and edit with `[CITE:lastnameYEAR]` placeholders, never hardcoded numbers. Numbering pass runs after content is stable. Renumbering is automatic when citations are added, removed, or reordered.
@@ -598,6 +437,10 @@ Always pair criticism with acknowledgment. The structure is: "X achieved [positi
 - `mcp__paper-search__*` — search across arXiv, bioRxiv, medRxiv, PubMed, Google Scholar
 - `mcp__pdf-reader__read_pdf` — extract text from local PDFs
 - `ListMcpResourcesTool` — check available MCP servers
+
+**Reference files** (load on-demand when format/tone details needed):
+- `references/citation-formats.md` — IEEE, SCI, EI, GB/T 7714, APA, MLA, Chicago, ACM format rules
+- `references/diplomatic-critique.md` — phrase bank for diplomatic literature review writing
 
 **Scripts** (deterministic, no LLM guessing):
 - `scripts/cite_scan.py` — placeholder scanner + numbering pass engine. Always use this for numbering, never do it manually.
