@@ -407,6 +407,18 @@ Running 7 checks one by one...
 All checks passed. 1 warning: add citation for the SOTA claim on line 45.
 ```
 
+### MANDATORY: Final Summary Table
+
+**Every task MUST end with the reference table. No exceptions.** After Phase 6 completes, run:
+
+```
+python scripts/cite_table.py <draft_file>
+```
+
+The script outputs a formatted 4-column table (序号|作者|正文引用|状态) directly in the conversation. This is the skill's final report — a hard-coded, script-generated summary that proves every citation is real and traceable.
+
+**If the user asked for a file output**, also append the table to the file. But the table MUST appear in the conversation as the skill's closing output.
+
 ---
 
 ## Key Principles
@@ -418,6 +430,7 @@ All checks passed. 1 warning: add citation for the SOTA claim on line 45.
 - **Traceability first**: every citation must resolve to a real paper with verified metadata.
 - **No hallucinated papers**: never invent titles, authors, or DOIs — use search tools to verify.
 - **Show progress always**: print a header before each phase.
+- **End with table**: every task ends with `cite_table.py` output as the summary report in the conversation.
 - **Auto-search over asking**: if the user didn't provide papers, search automatically.
 
 ## External Resources
