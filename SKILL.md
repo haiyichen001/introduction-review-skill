@@ -19,34 +19,14 @@ Use this skill when the user:
 
 ## Workflow
 
-### Phase 0: Detect Intent
+### Phase 0: Check & Install MCP Tools
 
-**Before asking the user anything, analyze what they already have.**
+**This runs FIRST, before anything else. No tool means no paper search, no citation — everything downstream depends on this.**
 
-Print a clear status header so the user knows what's happening:
+Print the skill banner and start checking immediately:
 
 ```
 === Introduction Review Skill ===
-Analyzing your input...
-```
-
-Check for:
-
-| Signal | Intent | Next step |
-|--------|--------|-----------|
-| User provided a draft (pasted text / file path) | Has draft → review & polish | Jump to Phase 2 |
-| User provided paper IDs (DOI, arXiv, title list) | Has papers → read & draft | Jump to Phase 2 |
-| User only gave a topic or vague request | Starting from scratch | Continue to Phase 1, then search |
-| User asked to "format references" or "check citations" | Reference-only task | Jump to Phase 5 |
-| User mentioned a target venue (journal, conference, thesis) | Style constraint noted | Apply format rules in Phase 3 and 5 |
-
-**If the user has NOT provided papers**: do NOT ask them to go find papers. Proceed to Phase 1 to search automatically.
-
-### Phase 1: Check & Install MCP Tools
-
-Print progress:
-
-```
 --- MCP Tool Check ---
 Checking required tools...
 ```
@@ -86,6 +66,25 @@ All required MCPs ready.
 3. If automatic install fails, print the exact command the user should run manually.
 
 4. After install, verify by calling `ListMcpResourcesTool` again.
+
+### Phase 1: Detect Intent
+
+**Now analyze what the user provided.**
+
+```
+--- Detecting Intent ---
+Analyzing your input...
+```
+
+| Signal | Intent | Next step |
+|--------|--------|-----------|
+| User provided a draft (pasted text / file path) | Has draft → review & polish | Jump to Phase 3 |
+| User provided paper IDs (DOI, arXiv, title list) | Has papers → read & draft | Jump to Phase 2 |
+| User only gave a topic or vague request | Starting from scratch | Continue to Phase 2, search automatically |
+| User asked to "format references" or "check citations" | Reference-only task | Jump to Phase 5 |
+| User mentioned a target venue (journal, conference, thesis) | Style constraint noted | Apply format rules in Phase 3 and 5 |
+
+**If the user has NOT provided papers**: do NOT ask them to go find papers. Proceed to Phase 2 to search automatically.
 
 ### Phase 2: Gather Papers
 
