@@ -89,24 +89,51 @@ All required MCPs ready.
 
 4. Verify again after install.
 
+### CRITICAL: Flexible Routing — User Demand Drives the Flow
+
+**Phases are NOT strict 0→1→2→... This is NOT a pipeline. It's a menu.**
+
+The user may arrive with any need. Detect it and jump directly to the right phase. The full sequence only applies when the user starts from scratch with just a topic.
+
+Valid entry points and direct jumps:
+
+| User says | Jump to | Skip phases 0,1,2,3,4 |
+|-----------|---------|------------------------|
+| "帮我搜XXX相关的论文" | Phase 2 (search papers) | Skip 1 |
+| "帮我写这个topic的introduction" (no papers) | Phase 0→1→2→3 | None skipped |
+| "我有几篇论文，帮我写intro" + gives IDs | Phase 1→2→3 | Skip paper search portion of 2 |
+| "帮我改这段intro" + pastes draft | Phase 3 (edit mode) → 4 | Skip 0,1,2 |
+| "帮我格式化参考文献" + gives papers | Phase 5 | Skip 0,1,2,3,4 |
+| "检查引用有没有问题" + gives draft+refs | Phase 6 | Skip 0,1,2,3,4,5 |
+| "把这段intro里的引用从APA改成IEEE" | Phase 5 (reformat) | Skip 0,1,2,3,4 |
+| "我删了一篇引用，帮我重新编号" | Phase 4 (renumber only) | Skip 0,1,2,3,5 |
+
+**Rule**: Ask yourself "what does the user actually need RIGHT NOW?" and go there. Don't force them through irrelevant phases.
+
 ### Phase 1: Detect Intent
 
-**Now analyze what the user provided.**
+**Analyze user input and route to the correct phase. Show the analysis process.**
 
 ```
 --- Detecting Intent ---
-Analyzing your input...
+Input type: [draft / paper IDs / topic only / reference request / audit request]
+Target venue: [detected or unspecified]
+Action: jump to Phase [N]
 ```
 
-| Signal | Intent | Next step |
-|--------|--------|-----------|
-| User provided a draft (pasted text / file path) | Has draft → review & polish | Jump to Phase 3 |
-| User provided paper IDs (DOI, arXiv, title list) | Has papers → read & draft | Jump to Phase 2 |
-| User only gave a topic or vague request | Starting from scratch | Continue to Phase 2, search automatically |
-| User asked to "format references" or "check citations" | Reference-only task | Jump to Phase 5 |
-| User mentioned a target venue (journal, conference, thesis) | Style constraint noted | Apply format rules in Phase 3 and 5 |
+Stream the detection steps:
+1. Scan input for file paths, DOIs, arXiv IDs, pasted text
+2. Check for venue keywords (学位论文, IEEE, SCI, EI, etc.)
+3. Determine the minimal phase needed
+4. Print the routing decision
 
-**If the user has NOT provided papers**: do NOT ask them to go find papers. Proceed to Phase 2 to search automatically.
+```
+--- Detecting Intent ---
+  Scanning for drafts or file paths... [found: pasted text]
+  Scanning for paper IDs (DOI, arXiv)... [found: 3 IDs]
+  Scanning for venue keywords... [found: "IEEE"]
+  Routing decision: Phase 2 (fetch paper metadata) → Phase 3 (draft with IEEE style)
+```
 
 ### Phase 2: Gather Papers
 
