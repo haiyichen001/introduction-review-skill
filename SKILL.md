@@ -297,7 +297,22 @@ When pointing out limitations of existing research, use measured, evidence-based
 
 ### Phase 4: Review & Polish
 
-Before showing the draft to the user, run the numbering pass to replace all placeholders with real numbers.
+**Before showing the draft to the user, the skill MUST proactively ask whether to run the numbering pass.** Do NOT wait for the user to remember — most users forget.
+
+Use `AskUserQuestion`:
+
+```
+Question: "Content looks stable. Ready to convert [CITE:key] placeholders to [1][2][3] numbers and generate the reference list?"
+Options:
+  - "Yes, generate numbers" (Recommended)
+  - "Not yet, let me review placeholders first"
+```
+
+If user chooses "Yes":
+- Run the numbering pass
+- Replace all placeholders with real numbers
+- Generate the reference list
+- Show the complete numbered draft
 
 ```
 --- Numbering Pass ---
@@ -316,7 +331,9 @@ All placeholders replaced. Reference list generated.
 - Flow check: transition between related work and our approach could be stronger
 ```
 
-Show the numbered draft to the user for review.
+If user chooses "Not yet", show the draft with placeholders visible for their review.
+
+**After any subsequent edit that touches citations**, the skill MUST proactively ask again: "Citation order changed. Renumber now?" Same two-option prompt as above.
 
 **If user requests edits** (add/remove/reorder citations):
 1. Revert the affected section back to placeholder form
