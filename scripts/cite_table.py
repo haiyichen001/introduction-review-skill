@@ -85,9 +85,9 @@ def main():
         key = occ['key']
         if key not in key_first_seen:
             key_first_seen[key] = True
-            occ['status'] = 'OK ✅'
+            occ['status'] = '✅'
         else:
-            occ['status'] = 'Reuse 🔄'
+            occ['status'] = '🔄'
 
     # Build table lines
     lines = []
