@@ -12,6 +12,7 @@ import re
 import sys
 import json
 import os
+import time
 import tempfile
 from collections import OrderedDict
 
@@ -117,6 +118,7 @@ def main():
     write_status(status_lines)
     console.print(map_table)
     console.print()
+    time.sleep(0.5)  # let status line pick up the state
 
     # === STEP 3: Replacement + numbered text ===
     def replacer(match):
@@ -134,8 +136,6 @@ def main():
 
     # Clear status file — task complete
     write_status(['\033[1;32m Cite Done\033[0m'])
-    # Let status line show completion briefly, then clean up
-    import time
     time.sleep(2)
     try:
         os.remove(STATUS_FILE)
