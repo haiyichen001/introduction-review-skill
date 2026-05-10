@@ -7,7 +7,7 @@ An agent skill that assists with writing academic introductions, literature revi
 - Auto-searches papers on arXiv, Semantic Scholar, PubMed, bioRxiv/medRxiv
 - Drafts structured introductions (hook → gap → related work → approach → contributions)
 - **Placeholder system** — edit with `[CITE:xxx]`, run numbering pass to get `[1][2][3]`. Add or remove citations, renumber with one command
-- **Progressive display** — three rich tables show Scan → Mapping → Numbered Text as the pass runs
+- **Reference table** — `cite_table.py` generates a formatted 4-column table (序号|作者|正文引用|状态) with adaptive Chinese/English headers
 - **Deterministic scripts** — numbering pass via `scripts/cite_live.py`, no LLM guessing
 - Generates references in IEEE, SCI/Vancouver, EI, GB/T 7714, APA, MLA, Chicago, ACM, BibTeX
 - Cites audit: ordering, orphans, missing refs, group size, unsupported claims
