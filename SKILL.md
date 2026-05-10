@@ -321,16 +321,13 @@ point clouds well. Recent methods combine both [1-4].
 
 **When to group citations**: Multiple papers that independently support the SAME claim can share a bracket. Example: `Several studies [4-7] have confirmed this finding.` If this exceeds 3, ask the user.
 
-#### CRITICAL: Diplomatic Critique — Do Not Attack Prior Work
+#### Guideline: Diplomatic Critique (NOT a Hard Rule)
 
-When pointing out limitations of existing research, use measured, evidence-based language. Never use aggressive or dismissive terms.
+**This is a guideline, not a requirement.** Adjust tone to your field and the actual situation.
 
-Core rules:
-- No: "X completely fails to...", "X ignores...", "X fundamentally flawed...", "X makes no attempt..."
-- Yes: paired acknowledgment+critique ("While X achieved Y, their approach has limitations when...")
-- Compare scope and trade-offs, never condemn
+General principle: critique the work, not the authors. Point out limitations with evidence, not emotion. But if a paper genuinely has serious methodological flaws or the field norms are direct, use straightforward language.
 
-**Load `references/diplomatic-critique.md` for the full phrase bank** — includes gap-highlighting templates, acknowledgment-before-critique examples, and forbidden phrase replacements.
+The phrase bank in `references/diplomatic-critique.md` is a reference, not a straitjacket. Use common sense — some papers do ignore obvious factors, some methods are wrong for a specific task. Say what's true.
 
 ### Phase 4: Review & Polish
 
