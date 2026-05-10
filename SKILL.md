@@ -342,21 +342,17 @@ Options:
   - "Not yet, let me review placeholders first"
 ```
 
-If user chooses "Yes", run the numbering pass with **Monitor** for real-time streaming output:
+If user chooses "Yes", run the numbering pass with `cite_live.py` (three rich-formatted tables):
 
-→ First, save the draft with placeholders to a temp file.
-→ Then start Monitor with `scripts/cite_stream.py`:
+→ Save the draft with placeholders to a temp file.
+→ Run: `python scripts/cite_live.py <draft_file>`
 
-```
-Monitor command: python scripts/cite_stream.py <draft_file>
-```
+The script outputs three progressive tables:
+  **Step 1/3 — Citation Scan**: all [CITE:xxx] found, in first-appearance order
+  **Step 2/3 — Number Assignment**: mapping table # | Key | Paper | Meta
+  **Step 3/3 — Numbered Text**: full draft with [1][2][3]... citations
 
-The script outputs one line at a time with `flush()`. Monitor streams each line to the conversation as it arrives. The user sees:
-  1. **Scan phase** — each placeholder found, one per line
-  2. **Mapping phase** — each [#] ← [CITE:xxx] assignment
-  3. **Numbered text** — final draft with [1][2][3]...
-
-Output stays in the conversation after completion. Parse the JSON at the end for Phase 5.
+Parse the trailing JSON for Phase 5 reference generation.
 
 If user chooses "Not yet", show the draft with placeholders visible for their review.
 
@@ -440,6 +436,5 @@ All checks passed. 1 warning: add citation for the SOTA claim on line 45.
 - `references/diplomatic-critique.md` — phrase bank for diplomatic literature review writing
 
 **Scripts** (deterministic, no LLM guessing):
-- `scripts/cite_stream.py` — **primary**: real-time streaming via Monitor, line-by-line output for live conversation display
-- `scripts/cite_live.py` — rich dashboard with formatted tables (for direct terminal use)
+- `scripts/cite_live.py` — **primary**: rich-formatted progressive tables (Scan → Mapping → Numbered Text), use in Phase 4
 - `scripts/cite_scan.py` — plain-text version for headless/pipe usage
