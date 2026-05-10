@@ -4,49 +4,48 @@ An agent skill that assists with writing academic introductions, literature revi
 
 ## What it does
 
-- Auto-searches papers on arXiv, Semantic Scholar, PubMed, bioRxiv/medRxiv based on your topic
+- Auto-searches papers on arXiv, Semantic Scholar, PubMed, bioRxiv/medRxiv
 - Drafts structured introductions (hook → gap → related work → approach → contributions)
-- Manages citations with a placeholder system — never manually renumber references again
-- Generates reference lists in IEEE, APA, GB/T 7714, Vancouver, MLA, Chicago, ACM, BibTeX
-- Audits citations for ordering, orphans, unsupported claims, and diplomatic tone
+- **Placeholder system** — edit with `[CITE:xxx]`, run numbering pass to get `[1][2][3]`. Add or remove citations, renumber with one command
+- **Deterministic scripts** — numbering pass runs via `scripts/cite_scan.py`, no LLM guessing
+- Generates references in IEEE, SCI/Vancouver, EI, GB/T 7714, APA, MLA, Chicago, ACM, BibTeX
+- Cites audit: ordering, orphans, missing refs, group size, unsupported claims
+- Flexible routing: jumps to the phase you need, skips what you don't
+
+## Project structure
+
+```
+introduction-review-skill/
+├── SKILL.md                    # Core instructions (~18KB)
+├── README.md
+├── scripts/
+│   └── cite_scan.py            # Placeholder scanner + numbering pass engine
+└── references/
+    ├── citation-formats.md     # IEEE/SCI/EI/GB7714/APA/MLA/Chicago/ACM rules
+    └── diplomatic-critique.md  # Phrase bank for lit review writing (guideline)
+```
 
 ## Install
 
-Copy the `SKILL.md` to your Claude Code skills directory:
+Copy to your Claude Code skills directory:
 
 ```
-# Locate your skills directory
-ls ~/.claude/skills/
-
-# Copy the skill
 cp -r introduction-review-skill ~/.claude/skills/
 ```
 
-Or install via Smithery:
+Or via Smithery:
 
 ```
 npx skills add haiyichen001/introduction-review-skill
 ```
 
-Requires MCP servers: `arxiv`, `scholar`, `paper-search`, `pdf-reader`. The skill auto-checks and installs missing ones on first run.
+Requires MCP servers: `arxiv`, `scholar`, `paper-search`, `pdf-reader`. Auto-checks and installs missing ones on first run.
 
 ## Usage
 
-In Claude Code, type `/introduction-review-skill` or say "help me write an introduction".
+In Claude Code: `/introduction-review-skill` or say "help me write an introduction".
 
-Then provide:
-- A research topic (e.g., "neural mesh segmentation for noisy point clouds")
-- Or paper IDs (DOI, arXiv ID, title list)
-- Or an existing draft to polish
-
-The skill will guide you through 6 phases with visible progress at each step.
-
-## Citation rules enforced
-
-- Sequential numbering `[1]`, `[2]`, `[3]`... by first appearance
-- Max 3 citations per bracket (asks before exceeding)
-- Diplomatic critique language (no attacking prior work)
-- Chinese thesis support: GB/T 7714-2015 with superscript and bracket options
+Provide a topic, paper IDs, or a draft — the skill detects intent and routes to the right phase. Every step streams progress so you see what's happening.
 
 ## License
 
