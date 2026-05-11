@@ -49,11 +49,57 @@ Read: scripts/cite_output.txt
 
 The table is hard-coded, bilingual (中文/English auto-detected), and proves every citation is real. The disclaimer is also bilingual.
 
+## Always-On Checks (Self-Awareness)
+
+The skill MUST proactively sniff for these issues every time it touches citations — not just when the user says "audit". After any edit, draft, renumber, or table generation, mentally run through this list and flag problems in the reply.
+
+### 1. Citation Stacking (pile-up)
+- **Rule**: max 3 per bracket, absolute max 5.
+- **Check**: scan for `[N,N+1,N+2,N+3]` patterns. If >3 in one bracket, warn user and offer to split or reduce.
+- **Why**: one sentence citing 8 papers is lazy; each claim should cite its specific source.
+
+### 2. Format Compliance
+- **Rule**: venue-specific (IEEE/GB7714/EI/SCI/APA etc). Load `references/citation-formats.md` when user specifies a venue.
+- **Check**: 
+  - IEEE/GB7714/EI → numbered `[1] [2]`, references sequential by appearance.
+  - APA → author-year, references alphabetical. Not numbered.
+  - If user says "学位论文" but draft uses APA → warn immediately.
+  - Superscript vs inline bracket per venue convention.
+- **Why**: wrong format = desk rejection.
+
+### 3. Sequential Order
+- **Rule**: `[1] [2] [3]...` by first-appearance order.
+- **Check**: `cite_table.py` handles this, but verify no gaps or jumps after renumber.
+- **Why**: out-of-order citations confuse reviewers and break reference mapping.
+
+### 4. Orphan / Missing
+- **Rule**: every in-text citation has a reference entry; every reference entry is cited in text.
+- **Check**: count unique placeholders vs reference entries. Mismatch = flag.
+- **Why**: orphan refs look sloppy; missing refs break traceability.
+
+### 5. Tone (Diplomatic Critique)
+- **Rule**: guideline from `references/diplomatic-critique.md`. Not hard, but worth checking.
+- **Check**: scan for forbidden phrases ("fails to", "ignores", "fundamentally flawed"). Flag if found.
+- **Why**: overly harsh critique weakens credibility.
+
+### When to Run Checks
+
+| Trigger | Checks to run |
+|---------|--------------|
+| After drafting | 3 (order), 5 (tone) |
+| After renumbering | 1 (stacking), 3 (order), 4 (orphan) |
+| After generating refs | 2 (format), 4 (orphan) |
+| User mentions venue | 2 (format) |
+| Before final output | ALL 1-5 |
+
+If any check fails, report it alongside the table. Don't block — warn and let the user decide.
+
 ## Key Principles
 
 - **Placeholder-first**: `[CITE:xxx]` only, never hardcoded numbers.
 - **Script is law**: `cite_table.py` does all numbering — deterministic, no LLM errors.
 - **End with table**: every task, no exceptions.
+- **Always check**: after every citation touch, run relevant Always-On Checks.
 - **No hallucinated papers**: verify with arxiv/scholar MCP tools.
 - **Show progress**: `✅` per step, emoji keep it scannable.
 
