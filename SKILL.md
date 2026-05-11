@@ -72,7 +72,11 @@ Every scenario ends: `cite_table.py` → `Read cite_output.txt` → paste table 
    - **Allowed**: opening/transition sentences can be broad. "The field has seen rapid progress [1-3]" is fine once or twice.
    - **Required**: the body of the review must give each cited paper its own sentence with specific contribution. One vague sentence won't trigger a warning; a review where every citation is anonymous will.
    - Bad: "Recent work [5,6] has formalized agent execution." (who? did what?)
-   - Good: "Wei [5] analyzed 70 projects and identified five design dimensions---finding registry-oriented tools remain dominant. Guerin and Guerin [6] proposed KAIJU, demonstrating that execution-reasoning separation enforces behavioral guarantees."
+   - Citation placement: only two positions are valid:
+     1. Sentence end as evidence: "...reduced errors by 23% [5]."
+     2. Natural pause (never comma sandwich): "...as demonstrated in prior studies [5,6], the trend holds..."
+     - NEVER: `, [5],` (comma sandwich with no anchor). NEVER: `Smith [5] proposed` (attached to author name — use sentence-end instead).
+   - Good: "Wei analyzed 70 projects and identified five design dimensions, finding registry-oriented tools remain dominant [5]. Guerin and Guerin proposed KAIJU, demonstrating that execution-reasoning separation enforces behavioral guarantees [6]."
    - Guideline, not hard rule.
 
 Report after table: one line per check, `✅` or `⚠️`.
