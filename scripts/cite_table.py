@@ -13,8 +13,8 @@ from collections import OrderedDict
 
 # Three universal patterns — covers all common citation formats
 PATTERNS = [
-    # [CITE:key] [REF:key] [cite:key] [ref:key] (case-insensitive)
-    re.compile(r'\[(?:CITE|REF|cite|ref):([a-zA-Z0-9_\-]+)\]', re.IGNORECASE),
+    # [CITE:key] [REF:key] [REF01] [ref-1] [CITEkey] (colon/hyphen optional)
+    re.compile(r'\[(?:CITE|REF|cite|ref)[:\-]?([a-zA-Z0-9_\-]+)\]', re.IGNORECASE),
 
     # \cite{key} \citep{key} \citet{key} \autocite{key} \parencite{key}
     # \textcite{key} \supercite{key} \footcite{key}
@@ -89,7 +89,9 @@ def extract_context(text, start, end, half=20):
 
 def format_author(key):
     name = re.split(r'\d', key)[0]
-    if name and name[0].islower():
+    if not name:
+        return key  # purely numeric like '01'
+    if name[0].islower():
         name = name[0].upper() + name[1:]
     return name
 
