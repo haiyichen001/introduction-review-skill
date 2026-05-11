@@ -50,28 +50,20 @@ def scan_order(text):
     return seen
 
 
-def extract_context(text, start, end, max_len=50):
-    """Extract the sentence containing the citation, truncated."""
-    before = text[:start]
-    after = text[end:]
+def extract_context(text, start, end, half=25):
+    """Extract ~half chars before and ~half chars after the citation. Total ~50 chars."""
+    before = text[:start].replace('\n', ' ')
+    after = text[end:].replace('\n', ' ')
 
-    sent_start = 0
-    for sep in ['. ', '.\n', '! ', '?\n', '!\n', '?\n']:
-        idx = before.rfind(sep)
-        if idx > sent_start:
-            sent_start = idx + len(sep)
+    pre = before[-half:] if len(before) > half else before
+    post = after[:half] if len(after) > half else after
 
-    sent_end = len(text)
-    for sep in ['. ', '.\n', '! ', '? ', '!\n', '?\n']:
-        idx = after.find(sep)
-        if idx != -1 and idx + end < sent_end:
-            sent_end = idx + end + 1
-            break
+    if len(before) > half:
+        pre = '...' + pre
+    if len(after) > half:
+        post = post + '...'
 
-    sentence = text[sent_start:sent_end].replace('\n', ' ').strip()
-    if len(sentence) > max_len:
-        sentence = sentence[:max_len - 3] + '...'
-    return sentence
+    return pre + f'[CITE_PLACEHOLDER]' + post
 
 
 def format_author(key):
@@ -114,7 +106,7 @@ def main():
         key = match.group(1)
         num = mapping[key]
         ctx = extract_context(text, match.start(), match.end())
-        ctx = ctx.replace(f'[CITE:{key}]', f'[{num}]')
+        ctx = ctx.replace('[CITE_PLACEHOLDER]', f'[{num}]')
         occurrences.append({'num': num, 'key': key, 'context': ctx})
 
     # Status: first occurrence = OK, subsequent = Reuse
