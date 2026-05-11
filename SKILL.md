@@ -68,10 +68,12 @@ Every scenario ends: `cite_table.py` → `Read cite_output.txt` → paste table 
 3. **Order** — gaps or jumps? Script catches this.
 4. **Orphan** — in-text count != reference count? Report.
 5. **Tone** — "fails to", "ignores", "fundamentally flawed"? Load `references/diplomatic-critique.md`.
-6. **Citation depth** — each cited paper should appear as: **who + did what + found what (data/conclusion) + [N]**. A bare `[N]` at the end of a vague sentence tells the reader nothing. Example:
-   - Bad: "Recent work [5,6] has formalized agent execution."
+6. **Citation depth** — most citations should follow: **who + did what + found what (data/conclusion) + [N]**. A bare `[N]` tells the reader nothing.
+   - **Allowed**: opening/transition sentences can be broad. "The field has seen rapid progress [1-3]" is fine once or twice.
+   - **Required**: the body of the review must give each cited paper its own sentence with specific contribution. One vague sentence won't trigger a warning; a review where every citation is anonymous will.
+   - Bad: "Recent work [5,6] has formalized agent execution." (who? did what?)
    - Good: "Wei [5] analyzed 70 projects and identified five design dimensions---finding registry-oriented tools remain dominant. Guerin and Guerin [6] proposed KAIJU, demonstrating that execution-reasoning separation enforces behavioral guarantees."
-   - If a citation is just "prior work exists [3]", rewrite it or remove it. Guideline, not hard rule — adjust to field norms.
+   - Guideline, not hard rule.
 
 Report after table: one line per check, `✅` or `⚠️`.
 
