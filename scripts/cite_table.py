@@ -11,17 +11,9 @@ import os
 import json
 from collections import OrderedDict
 
-# Three universal patterns — covers all common citation formats
+# Single canonical pattern — the LLM normalizes all formats to [CITE:key] before running this
 PATTERNS = [
-    # [CITE:key] [REF:key] [REF01] [ref-1] [CITEkey] (colon/hyphen optional)
-    re.compile(r'\[(?:CITE|REF|cite|ref)[:\-]?([a-zA-Z0-9_\-]+)\]', re.IGNORECASE),
-
-    # \cite{key} \citep{key} \citet{key} \autocite{key} \parencite{key}
-    # \textcite{key} \supercite{key} \footcite{key}
-    re.compile(r'\\(?:auto|paren|text|super|foot|)cite(?:p|t)?\{([a-zA-Z0-9_\-]+)\}'),
-
-    # [@key] Pandoc / Quarto markdown
-    re.compile(r'\[@([a-zA-Z0-9_\-:./#&$%+?<>~]+)\]'),
+    re.compile(r'\[CITE:([a-zA-Z0-9_\-]+)\]'),
 ]
 
 DISCLAIMER_EN = (

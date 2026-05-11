@@ -5,7 +5,13 @@ description: "Academic introduction and literature review writing with citation-
 
 # Introduction Review Skill
 
-Core loop: **write with `[CITE:lastnameYEAR]` placeholders → run `cite_table.py` → relay table in conversation → self-audit**. The script is the authority — no LLM handles citation numbering.
+Core loop: **normalize → run `cite_table.py` → relay table → self-audit**.
+
+1. **LLM normalizes**: scan user's draft for ANY citation format (`[REF01]`, `[REF:key]`, `\cite{key}`, `[@key]`, `[1]`, `①`, whatever) and convert all to `[CITE:descriptiveKey]`. The LLM is flexible; it handles every variant.
+2. **Script verifies**: `cite_table.py` only reads `[CITE:key]`. Hard-coded, deterministic, single regex. No guesswork.
+3. **Table proves**: the output table shows every normalized citation → the LLM didn't miss or invent anything.
+
+If the LLM misses a citation during normalization, the table will show fewer refs than expected — the user catches it immediately.
 
 ## When NOT to Use
 
@@ -23,9 +29,17 @@ Run `bash scripts/setup.sh` (or equivalent for Windows). This checks:
 
 If any missing, report and offer to install. Don't block — warn and proceed.
 
-## CRITICAL: Placeholder System
+## Normalization (run before script)
 
-**NEVER write `[1]`, `[2]`, `[3]`.** Always use `[CITE:lastnameYEAR]`. The script assigns numbers. Supports multiple input formats: `[CITE:key]`, `[REF:key]`, `\cite{key}`, `\citep{key}`, `[@key]` — all unified to `[N]` on output.
+If the user's draft uses any non-`[CITE:key]` citation format, normalize it first. Scan for all citation-like patterns and convert to `[CITE:lastnameYEAR]`:
+
+- `[REF01]` → `[CITE:ref01]`
+- `[REF:smith2023]` → `[CITE:smith2023]`
+- `\cite{jones2022}` → `[CITE:jones2022]`
+- `[@wang2024]` → `[CITE:wang2024]`
+- Bare `[1]` `[2]` → `[CITE:paper1]` `[CITE:paper2]` (ask user for descriptive keys)
+
+After normalization, run `cite_table.py`. The script only reads `[CITE:key]` — one format, no ambiguity.
 
 ```
 Draft:  "Smith [CITE:smith2023] proposed... Jones \cite{jones2022}..."
