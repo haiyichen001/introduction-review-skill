@@ -1,6 +1,6 @@
 # Citation Format Reference by Venue
 
-> Loaded on-demand during Phase 5 (Generate References) or when user asks about format rules.
+> Loaded with skill at startup. GB/T 7714-2015 is current (2025 version issued Dec 2025, effective Jul 2026 — not yet mandatory).
 
 ## General Principle: Sequential Numbering
 
