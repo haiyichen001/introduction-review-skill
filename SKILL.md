@@ -35,17 +35,21 @@ Every scenario ends the same way: `cite_table.py` → `Read cite_output.txt` →
 - Group limit: max 3 per bracket, absolute 5. Over 3 → warn user.
 - References ordered by appearance, not alphabetically (unless APA).
 
-## Always-On Checks
+## Always-On Checks (Repeated, Not One-Shot)
 
-**After every citation touch, self-audit. Flag issues alongside the table.**
+These are not hard gates — they are habits. The agent should run through them repeatedly, every time it touches citations, without the user asking. `cite_table.py` costs almost nothing to re-run; re-run it liberally.
 
-1. **Stacking** — >3 citations in one bracket? Warn.
-2. **Format** — venue mismatch? (e.g. APA style used for GB7714 thesis). Load `references/citation-formats.md` when user specifies venue.
-3. **Order** — gaps or jumps in `[1][2][3]...`? Script catches this.
-4. **Orphan** — ref in bibliography but not cited? Or cited but missing from refs? Count must match.
-5. **Tone** — forbidden phrases ("fails to", "ignores", "fundamentally flawed")? Reference `references/diplomatic-critique.md`.
+**After any change to citations (draft, add, remove, renumber, format), re-run `cite_table.py` and mentally walk through:**
 
-Report check results with the table: one line per check, `✅` or `⚠️`.
+1. **Stacking** — scan every bracket. >3 citations in one spot? Warn user. >5? Block and ask.
+2. **Format** — venue mismatch? Load `references/citation-formats.md` when user mentions a venue. Re-check after every reference generation.
+3. **Order** — script catches gaps and jumps, but agent should also spot-check manually.
+4. **Orphan** — count in-text citations vs reference entries. Mismatch = report immediately.
+5. **Tone** — quick scan for "fails to", "ignores", "fundamentally flawed". Load `references/diplomatic-critique.md` for full phrase list.
+
+**Reporting**: after each table output, append a one-line-per-check summary. `✅` = pass, `⚠️` = warn. Don't block progress — warn and let user decide.
+
+**Table is cheap**: `python scripts/cite_table.py <draft>` runs in under a second. Run it after every meaningful edit. The user trusts the table, not the agent's narration.
 
 ## Table Protocol (Mandatory)
 
