@@ -87,12 +87,23 @@ Report after table: one line per check, `✅` or `⚠️`. The script now auto-d
 
 ## Table Protocol (Mandatory)
 
+**First, detect if a .bib file exists** in the project directory. If yes, automatically use `--bib` mode.
+
 ```
+# With bib file (auto-detect):
+python scripts/cite_table.py <draft_file> --bib <bib_file>
+# Without bib file:
 python scripts/cite_table.py <draft_file>
+```
+
+Then:
+```
 Read: scripts/cite_output.txt
 → Paste table + audit summary in reply.
 → Then ask: "Need to add, remove, or change any citations?"
 ```
+
+If `--bib` mode was used, the table shows 6 columns comparing body order, bib key, bib position, and reference list order. Mismatches are flagged.
 
 Table is hard-coded, bilingual (中文/English auto-detected). 5 columns: # | Author | Body Context | Reference | Status. Repeated citations get `↳` sub-rows.
 
