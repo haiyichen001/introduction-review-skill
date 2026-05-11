@@ -1,55 +1,56 @@
 # introduction-review-skill
 
-An agent skill that assists with writing academic introductions, literature reviews, and citation-aware reference generation in multiple formats.
+Agent skill for academic introductions and literature reviews. Core engine: `cite_table.py` — a hard-coded script that scans `[CITE:xxx]` placeholders, assigns sequential numbers, and outputs a 5-column reference table.
 
-## Features
-
-- Auto-searches papers on arXiv, Semantic Scholar, PubMed, bioRxiv/medRxiv
-- Drafts structured introductions (hook -> gap -> related work -> approach -> contributions)
-- **Placeholder system** — edit with `[CITE:xxx]`, run numbering pass to get `[1][2][3]`. Add or remove citations, renumber with one command
-- **Reference table** — `cite_table.py` generates a 4-column summary (# | Author | Context | Status) as mandatory conversation output
-- **Hard-coded scripts** — all citation logic is deterministic, no LLM guessing
-- Generates references in IEEE, SCI/Vancouver, EI, GB/T 7714, APA, MLA, Chicago, ACM, BibTeX
-- Citation audit: ordering, orphans, missing refs, group size, unsupported claims
-- Flexible routing: jumps to the phase you need, skips what you don't
-- Adaptive CN/EN headers based on draft language
-
-## Project structure
+## How it works
 
 ```
-introduction-review-skill/
-├── SKILL.md                    # Core instructions
-├── README.md
-├── scripts/
-│   ├── cite_table.py           # Primary: reference table output (hard-coded)
-│   ├── cite_scan.py            # Numbered text + JSON mapping
-│   └── cite_live.py            # Rich-formatted progressive tables (optional)
-└── references/
-    ├── citation-formats.md     # IEEE/SCI/EI/GB7714/APA/MLA/Chicago/ACM rules
-    └── diplomatic-critique.md  # Phrase bank (guideline, not hard rule)
+Write with [CITE:lastnameYEAR] → run cite_table.py → table in conversation → self-audit
 ```
+
+The table is the user's trust anchor: deterministic, no LLM involvement, shows every citation mapped to its reference. Re-run it after every edit — it costs nothing.
+
+## Table output (5 columns)
+
+| # | Author | Body Context (--40) | Reference | Status |
+|---|--------|--------------------|-----------|--------|
+
+- Repeated citations get sub-rows with `↳` arrows
+- Bilingual: auto-detects Chinese/English from draft content
+- Disclaimer line included with every output
+
+## Always-On Checks
+
+The agent repeatedly self-audits after every citation change:
+1. **Stacking** — max 3 per bracket, absolute 5
+2. **Format** — venue mismatch detection (IEEE/GB7714/APA etc)
+3. **Order** — no gaps or jumps in `[1][2][3]...`
+4. **Orphan** — in-text count = reference count
+5. **Tone** — no "fails to", "ignores", "fundamentally flawed"
 
 ## Install
 
 ```bash
 cp -r introduction-review-skill ~/.claude/skills/
-```
-
-Or via Smithery:
-
-```bash
+# or
 npx skills add haiyichen001/introduction-review-skill
 ```
 
-Requires MCP servers: `arxiv`, `scholar`, `paper-search`, `pdf-reader`. Auto-checks and installs missing ones. Requires Python package `rich`.
+Requires: `arxiv`, `scholar`, `paper-search`, `pdf-reader` MCP servers. Python package `rich`.
 
-## Usage
+## Project structure
 
 ```
-/introduction-review-skill
+├── SKILL.md                     # Core instructions
+├── README.md
+├── scripts/
+│   ├── cite_table.py            # Core engine: scan, number, table (bilingual)
+│   ├── cite_scan.py             # Numbered text + JSON mapping
+│   └── cite_live.py             # Rich formatted tables (optional)
+└── references/
+    ├── citation-formats.md      # IEEE/SCI/EI/GB7714/APA/MLA/Chicago/ACM
+    └── diplomatic-critique.md   # Phrase bank (guideline)
 ```
-
-Provide a topic, paper IDs, or a draft. Every task ends with a hard-coded reference table in the conversation — no hallucinated citations.
 
 ## License
 
