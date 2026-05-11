@@ -79,7 +79,11 @@ Every scenario ends: `cite_table.py` → `Read cite_output.txt` → paste table 
    - Good: "Wei analyzed 70 projects and identified five design dimensions, finding registry-oriented tools remain dominant [5]. Guerin and Guerin proposed KAIJU, demonstrating that execution-reasoning separation enforces behavioral guarantees [6]."
    - Guideline, not hard rule.
 
-Report after table: one line per check, `✅` or `⚠️`.
+Report after table: one line per check, `✅` or `⚠️`. The script now auto-detects bad placement (⚠️sandwich, ⚠️author) and prints warnings at the bottom of the table.
+
+**After every edit, full re-scan**: never fix one citation and skip checking the rest. Run `cite_table.py` on the entire draft after every change. The table output is the proof that nothing was missed.
+
+**After table, read all [N] aloud**: scan every `[N]` in the numbered output. If a citation reads awkwardly in context — bare, orphaned, sandwich — rewrite the sentence. The script catches placement, the agent catches flow.
 
 ## Table Protocol (Mandatory)
 

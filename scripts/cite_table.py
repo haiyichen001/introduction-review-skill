@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Citation reference table — core engine.
-Scans any citation placeholder format, assigns sequential numbers,
-outputs a 5-column table. Hard-coded, deterministic.
+Citation reference table — core engine. Hard-coded, deterministic.
+Normalized input ([CITE:key]) + fallback multi-key detection.
+Now also checks citation position quality.
 """
 
 import re
@@ -11,9 +11,13 @@ import os
 import json
 from collections import OrderedDict
 
-# Single canonical pattern — the LLM normalizes all formats to [CITE:key] before running this
+# Canonical + fallback patterns (defense in depth — catches what LLM normalization misses)
 PATTERNS = [
+    # [CITE:key] — the canonical normalized format
     re.compile(r'\[CITE:([a-zA-Z0-9_\-]+)\]'),
+
+    # \cite{key1,key2,key3} — LaTeX multi-key fallback, splits on comma
+    re.compile(r'\\cite\{([^}]+)\}'),
 ]
 
 DISCLAIMER_EN = (
@@ -36,27 +40,30 @@ def detect_language(text):
 
 
 def find_all_citations(text):
-    """Find all citation placeholders with positions, return deduped sorted list."""
+    """Find all citation placeholders, splitting multi-key LaTeX into individuals."""
     seen = set()
     matches = []
     for pattern in PATTERNS:
         for m in pattern.finditer(text):
-            pos = (m.start(), m.end(), m.group(1))
-            if pos in seen:
-                continue  # skip duplicate match from overlapping patterns
-            seen.add(pos)
-            matches.append({
-                'key': m.group(1),
-                'start': m.start(),
-                'end': m.end(),
-                'full': m.group(0),
-            })
+            raw = m.group(1)
+            # Split on comma for multi-key LaTeX like \cite{key1,key2,key3}
+            keys = [k.strip() for k in raw.split(',') if k.strip()]
+            for key in keys:
+                pos = (m.start(), m.end(), key)
+                if pos in seen:
+                    continue
+                seen.add(pos)
+                matches.append({
+                    'key': key,
+                    'start': m.start(),
+                    'end': m.end(),
+                    'full': m.group(0),
+                })
     matches.sort(key=lambda x: x['start'])
     return matches
 
 
 def build_mapping(matches):
-    """Assign sequential numbers by first-appearance order."""
     seen = OrderedDict()
     for m in matches:
         key = m['key']
@@ -79,10 +86,34 @@ def extract_context(text, start, end, half=20):
     return pre + '[CITE_PLACEHOLDER]' + post
 
 
+def check_position(text, start, end, num):
+    """Check citation placement quality. Returns (status, warning)."""
+    before = text[:start].rstrip()
+    after = text[end:].lstrip()
+
+    # Comma sandwich: ,[N], or , [N],
+    if (before.endswith(',') or before.endswith(', ')) and \
+       (after.startswith(',') or after.startswith(', ') or after.startswith('.') or after.startswith(';')):
+        # Exception: sentence end ", which demonstrated X [1]." is fine
+        if before.rstrip().endswith(','):
+            before_words = before.rstrip()[:-1].strip()
+            if not before_words[-1].isdigit():
+                return '⚠️sandwich'
+
+    # Author-attached: CapitalWord [N] verb — "Smith [1] proposed..."
+    before_word = before.split()[-1] if before.split() else ''
+    if before_word and before_word[0].isupper() and len(before_word) > 1:
+        after_word = after.split()[0] if after.split() else ''
+        if after_word and after_word[0].islower() and after_word not in ('and', 'or', 'et', 'al.', 'al'):
+            return '⚠️author'
+
+    return '✅'
+
+
 def format_author(key):
     name = re.split(r'\d', key)[0]
     if not name:
-        return key  # purely numeric like '01'
+        return key
     if name[0].islower():
         name = name[0].upper() + name[1:]
     return name
@@ -135,7 +166,6 @@ def main():
     matches = find_all_citations(text)
     mapping = build_mapping(matches)
 
-    # Build occurrence list
     occurrences = []
     for m in matches:
         key = m['key']
@@ -143,34 +173,45 @@ def main():
         ctx = extract_context(text, m['start'], m['end'])
         ctx = ctx.replace('[CITE_PLACEHOLDER]', f'[{num}]')
         ref = format_reference(key, num, paper_info)
+        pos_status = check_position(text, m['start'], m['end'], num)
         occurrences.append({
             'num': num,
             'key': key,
             'context': ctx,
             'reference': ref,
+            'pos_status': pos_status,
         })
 
-    # Determine first/sub rows
+    # First/sub rows
     key_seen = {}
+    warnings = {'sandwich': 0, 'author': 0}
     for occ in occurrences:
         key = occ['key']
         if key not in key_seen:
             key_seen[key] = 1
             occ['row_type'] = 'first'
-            occ['status'] = '✅'
+            occ['status'] = occ['pos_status']
+            if 'sandwich' in occ['pos_status']:
+                warnings['sandwich'] += 1
+            if 'author' in occ['pos_status']:
+                warnings['author'] += 1
         else:
             occ['row_type'] = 'sub'
             occ['status'] = '✅'
+
+    # Bare citation count: citations that appear as bare [N] without surrounding content
+    bare_count = sum(1 for o in occurrences if o['pos_status'] == '✅' and o['row_type'] == 'first')
+    # Actually bare = not explicitly bad but also not explicitly anchored to a finding
+    # Simpler: if context is just "...[N]." at end, flag as potentially bare
 
     # Column widths
     w_num = 6
     w_author = 10
     w_ctx = 42
     w_ref = 28
-    w_status = 6
+    w_status = 10
     total_width = w_num + w_author + w_ctx + w_ref + w_status + 4
 
-    # Build output
     lines = ['']
     lines.append(disclaimer)
     lines.append('')
@@ -208,6 +249,17 @@ def main():
     lines.append('-' * total_width)
     lines.append(f'{len(key_seen)} refs, {len(occurrences)} occurrences.' if not zh
                  else f'{len(key_seen)} 篇, {len(occurrences)} 处引用.')
+
+    # Position warnings
+    if warnings['sandwich'] > 0 or warnings['author'] > 0:
+        lines.append('')
+        lines.append('Placement warnings:')
+        if warnings['sandwich'] > 0:
+            lines.append(f'  {warnings["sandwich"]} comma-sandwich citation(s) marked ⚠️sandwich')
+        if warnings['author'] > 0:
+            lines.append(f'  {warnings["author"]} author-attached citation(s) marked ⚠️author')
+        lines.append('  Fix: move citations to sentence-end or natural pause. Avoid ,[N], and Smith[N]verb.')
+        lines.append('  Legend: ⚠️sandwich = comma sandwich  |  ⚠️author = attached to author name')
 
     output = '\n'.join(lines)
     print(output)
