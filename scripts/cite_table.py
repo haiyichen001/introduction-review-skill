@@ -253,13 +253,21 @@ def main():
     # Position warnings
     if warnings['sandwich'] > 0 or warnings['author'] > 0:
         lines.append('')
-        lines.append('Placement warnings:')
+        lines.append('引用位置警告:' if zh else 'Placement warnings:')
         if warnings['sandwich'] > 0:
-            lines.append(f'  {warnings["sandwich"]} comma-sandwich citation(s) marked ⚠️sandwich')
+            en = f'  {warnings["sandwich"]} comma-sandwich citation(s) marked ⚠️sandwich'
+            zh_str = f'  {warnings["sandwich"]} 处逗号夹心引用，已标记 ⚠️sandwich'
+            lines.append(zh_str if zh else en)
         if warnings['author'] > 0:
-            lines.append(f'  {warnings["author"]} author-attached citation(s) marked ⚠️author')
-        lines.append('  Fix: move citations to sentence-end or natural pause. Avoid ,[N], and Smith[N]verb.')
-        lines.append('  Legend: ⚠️sandwich = comma sandwich  |  ⚠️author = attached to author name')
+            en = f'  {warnings["author"]} author-attached citation(s) marked ⚠️author'
+            zh_str = f'  {warnings["author"]} 处作者附着引用，已标记 ⚠️author'
+            lines.append(zh_str if zh else en)
+        en = '  Fix: move citations to sentence-end or natural pause. Avoid ,[N], and Smith[N]verb.'
+        zh_str = '  修复：将引用移至句末或自然停顿处。避免 ,[N], 和 作者[N]动词 格式。'
+        lines.append(zh_str if zh else en)
+        en = '  Legend: ⚠️sandwich = comma sandwich  |  ⚠️author = attached to author name'
+        zh_str = '  图例：⚠️sandwich = 逗号夹心  |  ⚠️author = 附着作者名'
+        lines.append(zh_str if zh else en)
 
     output = '\n'.join(lines)
     print(output)
