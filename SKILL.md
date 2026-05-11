@@ -100,7 +100,8 @@ Table is hard-coded, bilingual (中文/English auto-detected). 5 columns: # | Au
 
 - `cite_table.py` — the single core engine. Scan, number, 5-column table, position check, bilingual, hard-coded.
 
-## Reference Files
+## Reference Files (all loaded with skill at startup)
 
-- `citation-formats.md` — loaded with skill. IEEE/SCI/EI/GB7714/APA/MLA/Chicago/ACM rules.
-- `diplomatic-critique.md` — loaded with skill. Mandatory tone guard. No harsh critique ever.
+- `citation-placement-rules.md` — **mandatory**. Every citation must pass: no comma sandwich, no author-attached, no bare dangling, no stack >3, sentence-end or natural pause only. Enforced per citation, not per draft.
+- `citation-formats.md` — IEEE/SCI/EI/GB7714/APA/MLA/Chicago/ACM format rules.
+- `diplomatic-critique.md` — mandatory tone guard. No harsh critique ever.
