@@ -102,6 +102,7 @@ Table is hard-coded, bilingual (中文/English auto-detected). 5 columns: # | Au
 
 ## Reference Files (all loaded with skill at startup)
 
-- `citation-placement-rules.md` — **mandatory**. Every citation must pass: no comma sandwich, no author-attached, no bare dangling, no stack >3, sentence-end or natural pause only. Enforced per citation, not per draft.
+- `anti-laziness-protocol.md` — **mandatory verification gate**. Agent must itemize all 5 steps before declaring done. No batching, no "looks good". The structural countermeasure to LLM laziness.
+- `citation-placement-rules.md` — every citation must pass: no comma sandwich, no author-attached, no bare dangling, no stack >3. Enforced per citation.
 - `citation-formats.md` — IEEE/SCI/EI/GB7714/APA/MLA/Chicago/ACM format rules.
 - `diplomatic-critique.md` — mandatory tone guard. No harsh critique ever.
