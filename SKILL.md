@@ -64,10 +64,10 @@ Every scenario ends: `cite_table.py` → `Read cite_output.txt` → paste table 
 **After every citation touch, re-run `cite_table.py` and walk through:**
 
 1. **Stacking** — >3 citations in one bracket? Warn. >5? Block.
-2. **Format** — venue mismatch? Load `references/citation-formats.md`. Re-check after ref generation.
+2. **Format** — `references/citation-formats.md` is loaded with the skill at startup. Always match the user's venue. Re-check after every ref generation.
 3. **Order** — gaps or jumps? Script catches this.
 4. **Orphan** — in-text count != reference count? Report.
-5. **Tone** — "fails to", "ignores", "fundamentally flawed"? Load `references/diplomatic-critique.md`.
+5. **Tone** — `references/diplomatic-critique.md` is loaded with the skill at startup. Never use "fails to", "ignores", "fundamentally flawed". This is mandatory.
 6. **Citation depth** — most citations should follow: **who + did what + found what (data/conclusion) + [N]**. A bare `[N]` tells the reader nothing.
    - **Allowed**: opening/transition sentences can be broad. "The field has seen rapid progress [1-3]" is fine once or twice.
    - **Required**: the body of the review must give each cited paper its own sentence with specific contribution. One vague sentence won't trigger a warning; a review where every citation is anonymous will.
@@ -96,12 +96,11 @@ Read: scripts/cite_output.txt
 
 Table is hard-coded, bilingual (中文/English auto-detected). 5 columns: # | Author | Body Context | Reference | Status. Repeated citations get `↳` sub-rows.
 
-## Scripts
+## Script
 
-- `cite_table.py` — core engine. Scan, number, table, bilingual. Hard-coded.
-- `cite_scan.py` — numbered text output + JSON mapping.
+- `cite_table.py` — the single core engine. Scan, number, 5-column table, position check, bilingual, hard-coded.
 
 ## Reference Files
 
-- `citation-formats.md` — IEEE/SCI/EI/GB7714/APA/MLA/Chicago/ACM rules.
-- `diplomatic-critique.md` — phrase bank. Guideline, not hard rule.
+- `citation-formats.md` — loaded with skill. IEEE/SCI/EI/GB7714/APA/MLA/Chicago/ACM rules.
+- `diplomatic-critique.md` — loaded with skill. Mandatory tone guard. No harsh critique ever.
