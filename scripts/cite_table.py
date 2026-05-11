@@ -1,15 +1,10 @@
 #!/usr/bin/env python3
 """
-Citation reference table — the core engine of Introduction Review Skill.
+Citation reference table — core engine of Introduction Review Skill.
 Hard-coded, deterministic. Name-based indexing via [CITE:lastnameYEAR] placeholders.
 
-Four usage modes (called by the skill, not directly by user):
-  new     — first draft with placeholders
-  add     — existing draft, new [CITE:xxx] inserted
-  remove  — existing draft, some [CITE:xxx] removed
-  audit   — existing draft, check ordering + status only
-
-Output: 4-column table (序号|作者|正文引用|状态). Bilingual based on text content.
+Output: 5-column table (# | Author | Body Context | Reference | Status).
+Multiple occurrences of the same paper → sub-rows with  arrows.
 """
 
 import re
@@ -50,8 +45,8 @@ def scan_order(text):
     return seen
 
 
-def extract_context(text, start, end, half=25):
-    """Extract ~half chars before and ~half chars after the citation. Total ~50 chars."""
+def extract_context(text, start, end, half=20):
+    """Extract ~half chars before and after the citation, total ~40 chars."""
     before = text[:start].replace('\n', ' ')
     after = text[end:].replace('\n', ' ')
 
@@ -63,7 +58,7 @@ def extract_context(text, start, end, half=25):
     if len(after) > half:
         post = post + '...'
 
-    return pre + f'[CITE_PLACEHOLDER]' + post
+    return pre + '[CITE_PLACEHOLDER]' + post
 
 
 def format_author(key):
@@ -74,10 +69,35 @@ def format_author(key):
     return name
 
 
+def format_reference(key, num, paper_info=None):
+    """Format reference column: '[N] Author, ShortTitle, Year'"""
+    author = format_author(key)
+    year = ''
+    digits = re.findall(r'\d+', key)
+    if digits:
+        year = digits[-1]  # last number group is usually the year
+
+    if paper_info and key in paper_info:
+        info = paper_info[key]
+        title = info.get('title_short', info.get('title', ''))
+        yr = info.get('year', year)
+        # abbreviate title: first 3 words, max 15 chars
+        words = title.split()
+        short = ' '.join(words[:3])
+        if len(short) > 20:
+            short = short[:17] + '...'
+        return f'[{num}] {author}, {short}, {yr}'
+
+    # fallback: author + year from key
+    return f'[{num}] {author}, {year}'
+
+
 def main():
     # Read draft
+    draft_file = None
     if len(sys.argv) > 1 and sys.argv[1] not in ('--help', '-h'):
-        with open(sys.argv[1], 'r', encoding='utf-8') as f:
+        draft_file = sys.argv[1]
+        with open(draft_file, 'r', encoding='utf-8') as f:
             text = f.read()
     else:
         text = sys.stdin.read()
@@ -89,10 +109,18 @@ def main():
     # Localized strings
     num_hdr = '序号' if zh else '#'
     author_hdr = '作者' if zh else 'Author'
-    ctx_hdr = '正文引用(限50字)' if zh else 'Context (50 chars)'
+    ctx_hdr = '正文引用(前后20字)' if zh else 'Body Context (40)'
+    ref_hdr = '参考文献' if zh else 'Reference'
     status_hdr = '状态' if zh else 'Status'
-    title = '参考文献对照表' if zh else 'Reference Table'
     disclaimer = DISCLAIMER_ZH if zh else DISCLAIMER_EN
+
+    # Load paper info if available
+    paper_info = {}
+    if draft_file:
+        info_file = os.path.splitext(draft_file)[0] + '_info.json'
+        if os.path.exists(info_file):
+            with open(info_file, 'r', encoding='utf-8') as f:
+                paper_info = json.load(f)
 
     # Scan and map
     placeholders = scan_order(text)
@@ -107,46 +135,71 @@ def main():
         num = mapping[key]
         ctx = extract_context(text, match.start(), match.end())
         ctx = ctx.replace('[CITE_PLACEHOLDER]', f'[{num}]')
-        occurrences.append({'num': num, 'key': key, 'context': ctx})
+        ref = format_reference(key, num, paper_info)
+        occurrences.append({
+            'num': num,
+            'key': key,
+            'context': ctx,
+            'reference': ref,
+        })
 
-    # Status: first occurrence = OK, subsequent = Reuse
-    key_first_seen = {}
+    # Determine first/sub rows
+    key_seen = {}
     for occ in occurrences:
         key = occ['key']
-        if key not in key_first_seen:
-            key_first_seen[key] = True
+        if key not in key_seen:
+            key_seen[key] = 1
+            occ['row_type'] = 'first'
             occ['status'] = '✅'
         else:
-            occ['status'] = '🔄'
+            occ['row_type'] = 'sub'
+            occ['status'] = '✅'
 
-    # Build table
+    # Column widths
+    w_num = 6
+    w_author = 10
+    w_ctx = 42
+    w_ref = 28
+    w_status = 6
+    total_width = w_num + w_author + w_ctx + w_ref + w_status + 4
+
+    # Build output
     lines = ['']
     lines.append(disclaimer)
     lines.append('')
-    col_widths = [len(num_hdr) + 2, 14, 52, 10]
     lines.append(
-        f'{num_hdr:<{col_widths[0]}} '
-        f'{author_hdr:<{col_widths[1]}} '
-        f'{ctx_hdr:<{col_widths[2]}} '
-        f'{status_hdr:<{col_widths[3]}}'
+        f'{num_hdr:<{w_num}} '
+        f'{author_hdr:<{w_author}} '
+        f'{ctx_hdr:<{w_ctx}} '
+        f'{ref_hdr:<{w_ref}} '
+        f'{status_hdr:<{w_status}}'
     )
-    lines.append('-' * sum(col_widths))
+    lines.append('-' * total_width)
 
-    seen = set()
     for occ in occurrences:
+        num = occ['num']
         key = occ['key']
-        if key in seen:
-            continue
-        seen.add(key)
-        lines.append(
-            f'{occ["num"]:<{col_widths[0]}} '
-            f'{format_author(key):<{col_widths[1]}} '
-            f'{occ["context"]:<{col_widths[2]}} '
-            f'{occ["status"]:<{col_widths[3]}}'
-        )
+        author = format_author(key)
 
-    lines.append('-' * sum(col_widths))
-    lines.append(f'{len(seen)} references total.' if not zh else f'共 {len(seen)} 篇参考文献。')
+        if occ['row_type'] == 'first':
+            lines.append(
+                f'[{num}]{" "*(w_num-3)} '
+                f'{author:<{w_author}} '
+                f'{occ["context"]:<{w_ctx}} '
+                f'{occ["reference"]:<{w_ref}} '
+                f'{occ["status"]:<{w_status}}'
+            )
+        else:
+            lines.append(
+                f'     ↳{" "*(w_num-4)} '
+                f'{"↳":<{w_author}} '
+                f'{occ["context"]:<{w_ctx}} '
+                f'{"↳":<{w_ref}} '
+                f'{occ["status"]:<{w_status}}'
+            )
+
+    lines.append('-' * total_width)
+    lines.append(f'{len(key_seen)} references total, {len(occurrences)} occurrences.')
 
     output = '\n'.join(lines)
     print(output)
