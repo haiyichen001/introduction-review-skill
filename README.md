@@ -45,11 +45,12 @@ Requires: `arxiv`, `scholar`, `paper-search`, `pdf-reader` MCP servers. Python p
 ├── README.md
 ├── scripts/
 │   ├── cite_table.py            # Core engine: scan, number, table (bilingual)
-│   ├── cite_scan.py             # Numbered text + JSON mapping
-│   └── cite_live.py             # Rich formatted tables (optional)
+│   └── setup.sh                 # Environment check
 └── references/
-    ├── citation-formats.md      # IEEE/SCI/EI/GB7714/APA/MLA/Chicago/ACM
-    └── diplomatic-critique.md   # Phrase bank (guideline)
+    ├── anti-laziness-protocol.md     # Mandatory 5-step verification gate
+    ├── citation-formats.md           # IEEE/SCI/EI/GB7714/APA/MLA/Chicago/ACM
+    ├── citation-placement-rules.md   # Per-citation placement enforcement
+    └── diplomatic-critique.md        # Mandatory tone guard
 ```
 
 ## License
