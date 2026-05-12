@@ -2,6 +2,8 @@
 name: introduction-review-skill
 description: "Academic introduction and literature review writing with citation-aware reference generation. TRIGGER when: user asks to write/rewrite an introduction or literature review, add or remove citations, format references, audit citations, generate bibliography. SKIP when: user asks for a single-paper summary, general writing advice not involving citations, pure grammar fixes."
 compatibility: Requires MCP servers: arxiv, scholar, paper-search, pdf-reader
+version: 0.1.0
+license: MIT
 ---
 
 # Introduction Review Skill
