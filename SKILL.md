@@ -17,7 +17,7 @@ Single-paper summary, pure grammar polishing, non-academic writing, format conve
 
 ## Phase 0: Environment Check
 
-Run `bash scripts/setup.sh`. Checks Python 3.10+, `rich`, MCP servers (`arxiv`, `scholar`, `paper-search`, `pdf-reader`). Warn if missing, don't block.
+Run `bash ${CLAUDE_SKILL_DIR}/scripts/setup.sh`. Checks Python 3.10+, `rich`, MCP servers (`arxiv`, `scholar`, `paper-search`, `pdf-reader`). Warn if missing, don't block.
 
 ## Four Scenarios
 
@@ -50,8 +50,8 @@ Report: one line per check, `✅` or `⚠️`. Then full re-scan (never fix one 
 Auto-detect `.bib` file in project dir. If found, use `--bib` mode.
 
 ```
-python scripts/cite_table.py <draft> [--bib <bib_file>]
-Read: scripts/cite_output.txt
+python ${CLAUDE_SKILL_DIR}/scripts/cite_table.py <draft> [--bib <bib_file>]
+Read: ${CLAUDE_SKILL_DIR}/scripts/cite_output.txt
 → Paste table + audit. Then: "Need to add, remove, or change any citations?"
 ```
 
