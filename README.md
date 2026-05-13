@@ -1,3 +1,5 @@
+> **Merged into [Reference Workbench](https://github.com/haiyichen001/reference-workbench-skill). This repository is no longer updated.**
+
 # introduction-review-skill
 
 Agent skill for academic introductions and literature reviews. Core engine: `cite_table.py` — a hard-coded script that scans `[CITE:xxx]` placeholders, assigns sequential numbers, and outputs a 5-column reference table.
